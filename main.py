@@ -3,6 +3,7 @@ import glob
 import cv2
 from trackers.player_tracker import PlayerTracker
 from trackers.ball_tracker import BallTracker
+from court_line_detector.manual_court_selector import ManualCourtDetector
 
 def main():
     # Find sample video
@@ -35,32 +36,48 @@ def main():
 
     print(f"Successfully read {len(frames)} frames from the video.")
 
-    # Initialize PlayerTracker and BallTracker
+    # Initialize Trackers and Court Detector
     player_tracker = PlayerTracker(model_path='yolov8x.pt')
     ball_tracker = BallTracker(model_path='models/yolo5_last.pt')
+    court_detector = ManualCourtDetector()
 
     # Detect frames (and save to stub or read if already exists)
     player_stub_path = "tracker_stubs/player_detections.pkl"
     ball_stub_path = "tracker_stubs/ball_detections.pkl"
+    court_stub_path = "tracker_stubs/court_keypoints.pkl"
     
     # Read player tracking results from stub if present
     player_detections = player_tracker.detect_frames(
         frames, 
-        read_from_stub=True, 
+        read_from_stub=False, 
         stub_path=player_stub_path
     )
 
     # Read ball tracking results from stub if present
     ball_detections = ball_tracker.detect_frames(
         frames,
-        read_from_stub=True,
+        read_from_stub=False,
         stub_path=ball_stub_path
     )
 
-    # Draw annotations on frames (players first, then overlay ball)
-    print("Drawing bounding boxes and track IDs...")
+    # Interpolate ball positions to resolve flickering
+    ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
+
+    # Get court keypoints (GUI click if stub not present)
+    court_keypoints = court_detector.get_keypoints(frames[0], stub_path=court_stub_path)
+
+    # Choose active players manually or load from stub
+    active_track_ids = player_tracker.choose_active_players(frames[0], player_detections)
+
+    # Filter detections to keep only active players
+    player_detections = player_tracker.filter_by_track_ids(player_detections, active_track_ids)
+
+    # Draw annotations on frames (players first, then ball, then court lines)
+    print("Drawing bounding boxes, track IDs, and court keypoints...")
     annotated_frames = player_tracker.draw_bboxes(frames, player_detections)
     annotated_frames = ball_tracker.draw_bboxes(annotated_frames, ball_detections)
+    if court_keypoints:
+        annotated_frames = court_detector.draw_keypoints_on_video(annotated_frames, court_keypoints)
 
     # Save to output_videos/player_tracking_test.mp4
     output_dir = "output_videos"
