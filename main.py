@@ -38,7 +38,7 @@ def main():
 
     # Initialize Trackers and Court Detector
     player_tracker = PlayerTracker(model_path='yolov8x.pt')
-    ball_tracker = BallTracker(model_path='best.pt')
+    ball_tracker = BallTracker(model_path='models/yolo5_last.pt')
     court_detector = ManualCourtDetector()
 
     # Stub paths
