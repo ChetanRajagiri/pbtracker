@@ -9,79 +9,34 @@ class PlayerTracker:
         print(f"Initializing PlayerTracker with model: {model_path}")
         self.model = YOLO(model_path)
 
-    def choose_active_players(self, first_frame, player_detections, stub_path='tracker_stubs/active_players.pkl'):
-        # Check if stub exists
-        if stub_path and os.path.exists(stub_path):
-            print(f"Loading active player Track IDs from stub: {stub_path}")
-            with open(stub_path, 'rb') as f:
-                return pickle.load(f)
-
-        print("No active players stub found. Displaying Frame 0 to select Track IDs...")
-        
-        # Get frame 0 player detections
-        frame_0_detections = player_detections[0] if len(player_detections) > 0 else {}
-        
-        # Create a copy of the first frame to draw annotations
-        annotated_frame = first_frame.copy()
-        
-        for track_id, bbox in frame_0_detections.items():
-            x1, y1, x2, y2 = map(int, bbox)
-            
-            # Draw bounding box (bright neon green BGR: (0, 255, 0))
-            cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            
-            # Write Track ID above the box in bright neon red (BGR: (0, 0, 255))
-            label = f"ID: {track_id}"
-            cv2.putText(annotated_frame, label, (x1, y1 - 10), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2, cv2.LINE_AA)
-
-        # Display the frame to the user
-        cv2.imshow('Select Active Players', annotated_frame)
-        cv2.waitKey(1)  # Refresh window rendering
-
-        # Prompt user in terminal
-        user_input = input('Enter the Track IDs of the active players you want to track, separated by commas (e.g. 1, 2): ')
-        
-        # Parse inputs
-        active_track_ids = []
-        try:
-            active_track_ids = [int(x.strip()) for x in user_input.split(',') if x.strip()]
-        except ValueError:
-            print("Error parsing inputs. Defaulting to all detected Track IDs.")
-            active_track_ids = list(frame_0_detections.keys())
-
-        print(f"Tracking players with IDs: {active_track_ids}")
-        
-        # Close OpenCV window
-        cv2.destroyWindow('Select Active Players')
-        cv2.waitKey(1)
-
-        # Save to stub
-        if stub_path:
-            stub_dir = os.path.dirname(stub_path)
-            if stub_dir and not os.path.exists(stub_dir):
-                os.makedirs(stub_dir)
-            with open(stub_path, 'wb') as f:
-                pickle.dump(active_track_ids, f)
-
-        return active_track_ids
-
-    def filter_by_track_ids(self, player_detections, active_track_ids):
-        filtered_detections = []
-        for frame_dict in player_detections:
-            filtered_frame_dict = {}
-            for track_id, bbox in frame_dict.items():
-                if track_id in active_track_ids:
-                    filtered_frame_dict[track_id] = bbox
-            filtered_detections.append(filtered_frame_dict)
-        return filtered_detections
-
     def detect_frames(self, frames, read_from_stub=False, stub_path=None):
-        # 1. Load from stub if requested and exists
+        # 1. Load from stub if requested and exists (with frame count validation)
         if read_from_stub and stub_path and os.path.exists(stub_path):
             print(f"Loading player tracking data from stub: {stub_path}")
             with open(stub_path, 'rb') as f:
-                return pickle.load(f)
+                cached_data = pickle.load(f)
+                if len(cached_data) == len(frames):
+                    return cached_data
+                else:
+                    print(f"[WARNING] Cache mismatch detected. Stale tracking stub contains fewer frames than the active input video. Forcing full YOLO re-inference...")
+
+        # Load court keypoints to define boundaries
+        court_keypoints_path = "tracker_stubs/court_keypoints.pkl"
+        polygon = None
+        if os.path.exists(court_keypoints_path):
+            print(f"Loading court keypoints for boundary filtering: {court_keypoints_path}")
+            with open(court_keypoints_path, 'rb') as f:
+                court_keypoints = pickle.load(f)
+            if len(court_keypoints) >= 12:
+                corner1 = court_keypoints[0]   # Top-Left Far Baseline
+                corner2 = court_keypoints[2]   # Top-Right Far Baseline
+                corner3 = court_keypoints[11]  # Bottom-Right Near Baseline
+                corner4 = court_keypoints[9]   # Bottom-Left Near Baseline
+                polygon = np.array([corner1, corner2, corner3, corner4], dtype=np.int32)
+            else:
+                print(f"[WARNING] Insufficient court keypoints ({len(court_keypoints)}) to define polygon. Skipping filtering.")
+        else:
+            print(f"[WARNING] No court keypoints found at {court_keypoints_path}. Skipping boundary filtering.")
 
         print("Running object tracking on frames...")
         player_detections = []
@@ -97,7 +52,21 @@ class PlayerTracker:
                 if box.id is not None:
                     track_id = int(box.id[0].item())
                     coords = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
-                    frame_dict[track_id] = coords
+                    
+                    is_on_court = True
+                    if polygon is not None:
+                        # Calculate ground contact anchor point (feet)
+                        x_foot = (coords[0] + coords[2]) / 2.0
+                        y_foot = coords[3]
+                        
+                        # cv2.pointPolygonTest returns >= 0 if inside or on boundary
+                        is_inside = cv2.pointPolygonTest(polygon, (x_foot, y_foot), False)
+                        is_on_court = True if is_inside >= 0 else False
+                    
+                    frame_dict[track_id] = {
+                        'bbox': coords,
+                        'is_on_court': is_on_court
+                    }
             
             player_detections.append(frame_dict)
             if (i + 1) % 10 == 0 or (i + 1) == len(frames):
@@ -105,7 +74,6 @@ class PlayerTracker:
 
         # 3. Save to stub if path is provided
         if stub_path:
-            # Create directories if they do not exist
             stub_dir = os.path.dirname(stub_path)
             if stub_dir and not os.path.exists(stub_dir):
                 os.makedirs(stub_dir)
@@ -125,23 +93,27 @@ class PlayerTracker:
             # Get detections for current frame (if any)
             detections = player_detections[i] if i < len(player_detections) else {}
             
-            for track_id, bbox in detections.items():
+            for track_id, data in detections.items():
+                bbox = data['bbox']
+                is_on_court = data.get('is_on_court', True)
                 x1, y1, x2, y2 = map(int, bbox)
                 
-                # Draw the bounding box
-                # Primary color: neon cyan/green for premium styling (BGR format: (0, 255, 0))
-                cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                # Draw the bounding box (neon green if on court, orange if out)
+                color = (0, 255, 0) if is_on_court else (0, 165, 255)
+                cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
                 
                 # Draw the Tracking ID label
                 label = f"Player {track_id}"
+                if not is_on_court:
+                    label += " (Out)"
                 
                 # Get text height and width for styling background box
                 (w, h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
                 
                 # Draw label background box
-                cv2.rectangle(annotated_frame, (x1, y1 - 25), (x1 + w + 10, y1), (0, 255, 0), -1)
+                cv2.rectangle(annotated_frame, (x1, y1 - 25), (x1 + w + 10, y1), color, -1)
                 
-                # Put label text (Black text on green background)
+                # Put label text (Black text on background color)
                 cv2.putText(annotated_frame, label, (x1 + 5, y1 - 8), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv2.LINE_AA)
             

@@ -38,39 +38,33 @@ def main():
 
     # Initialize Trackers and Court Detector
     player_tracker = PlayerTracker(model_path='yolov8x.pt')
-    ball_tracker = BallTracker(model_path='models/yolo5_last.pt')
+    ball_tracker = BallTracker(model_path='best.pt')
     court_detector = ManualCourtDetector()
 
-    # Detect frames (and save to stub or read if already exists)
+    # Stub paths
     player_stub_path = "tracker_stubs/player_detections.pkl"
     ball_stub_path = "tracker_stubs/ball_detections.pkl"
     court_stub_path = "tracker_stubs/court_keypoints.pkl"
     
-    # Read player tracking results from stub if present
+    # 1. Get court keypoints first (so it exists for the tracking loop boundary filtering)
+    court_keypoints = court_detector.get_keypoints(frames[0], stub_path=court_stub_path)
+
+    # 2. Read/run player tracking results
     player_detections = player_tracker.detect_frames(
         frames, 
-        read_from_stub=False, 
+        read_from_stub=True, 
         stub_path=player_stub_path
     )
 
-    # Read ball tracking results from stub if present
+    # 3. Read/run ball tracking results
     ball_detections = ball_tracker.detect_frames(
         frames,
-        read_from_stub=False,
+        read_from_stub=True,
         stub_path=ball_stub_path
     )
 
-    # Interpolate ball positions to resolve flickering
+    # 4. Interpolate ball positions to resolve flickering
     ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
-
-    # Get court keypoints (GUI click if stub not present)
-    court_keypoints = court_detector.get_keypoints(frames[0], stub_path=court_stub_path)
-
-    # Choose active players manually or load from stub
-    active_track_ids = player_tracker.choose_active_players(frames[0], player_detections)
-
-    # Filter detections to keep only active players
-    player_detections = player_tracker.filter_by_track_ids(player_detections, active_track_ids)
 
     # Draw annotations on frames (players first, then ball, then court lines)
     print("Drawing bounding boxes, track IDs, and court keypoints...")
@@ -78,6 +72,19 @@ def main():
     annotated_frames = ball_tracker.draw_bboxes(annotated_frames, ball_detections)
     if court_keypoints:
         annotated_frames = court_detector.draw_keypoints_on_video(annotated_frames, court_keypoints)
+
+    # Draw frame counter on every annotated frame
+    total = len(annotated_frames)
+    for i, frame in enumerate(annotated_frames):
+        label = f"Frame {i} / {total}"
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        scale, thickness = 0.6, 2
+        (tw, th), _ = cv2.getTextSize(label, font, scale, thickness)
+        x = frame.shape[1] - tw - 15
+        y = 30
+        # Dark background pill for readability
+        cv2.rectangle(frame, (x - 8, y - th - 8), (x + tw + 8, y + 8), (0, 0, 0), -1)
+        cv2.putText(frame, label, (x, y), font, scale, (255, 255, 255), thickness, cv2.LINE_AA)
 
     # Save to output_videos/player_tracking_test.mp4
     output_dir = "output_videos"
