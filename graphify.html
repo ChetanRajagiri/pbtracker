@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pbtracker — Architecture Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0f;--surface:rgba(255,255,255,.04);--glass:rgba(255,255,255,.06);
+    --border:rgba(255,255,255,.08);--text:#e4e4e7;--muted:#71717a;
+    --accent:#818cf8;--accent2:#a78bfa;--green:#34d399;--amber:#fbbf24;
+    --rose:#fb7185;--cyan:#22d3ee;--orange:#fb923c;--pink:#f472b6;
+    --radius:14px;
+  }
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+
+  /* ── Canvas ── */
+  canvas#graph{position:fixed;inset:0;z-index:0;cursor:grab}
+  canvas#graph.grabbing{cursor:grabbing}
+
+  /* ── Header ── */
+  .header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;gap:16px;
+    padding:16px 28px;
+    background:linear-gradient(180deg,rgba(10,10,15,.95) 0%,rgba(10,10,15,.6) 100%);
+    backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  }
+  .header .logo{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;
+    box-shadow:0 0 24px rgba(129,140,248,.3);flex-shrink:0;
+  }
+  .header h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
+  .header .subtitle{font-size:12px;color:var(--muted);font-weight:400;margin-left:-8px}
+  .header .controls{margin-left:auto;display:flex;gap:8px}
+  .btn{
+    padding:7px 14px;border-radius:8px;border:1px solid var(--border);
+    background:var(--glass);color:var(--text);font-size:12px;font-family:inherit;
+    font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;
+  }
+  .btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}
+  .btn.active{background:rgba(129,140,248,.15);border-color:rgba(129,140,248,.4);color:var(--accent)}
+
+  /* ── Legend ── */
+  .legend{
+    position:fixed;bottom:20px;left:20px;z-index:100;
+    background:rgba(15,15,22,.85);backdrop-filter:blur(16px);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 20px;min-width:200px;
+  }
+  .legend h3{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:10px;font-weight:600}
+  .legend-item{display:flex;align-items:center;gap:10px;padding:4px 0;font-size:12px;font-weight:400}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .legend-line{width:24px;height:2px;border-radius:1px;flex-shrink:0}
+  .legend .sep{height:1px;background:var(--border);margin:8px 0}
+
+  /* ── Detail Panel ── */
+  .panel{
+    position:fixed;top:72px;right:20px;z-index:100;width:360px;max-height:calc(100vh - 100px);
+    background:rgba(15,15,22,.88);backdrop-filter:blur(24px);
+    border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;transform:translateX(400px);transition:transform .35s cubic-bezier(.4,0,.2,1);
+    display:flex;flex-direction:column;
+  }
+  .panel.open{transform:translateX(0)}
+  .panel-head{
+    padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;
+    flex-shrink:0;
+  }
+  .panel-icon{
+    width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+    font-size:18px;font-weight:700;
+  }
+  .panel-head h2{font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .panel-head .path{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+  .panel-close{
+    margin-left:auto;width:28px;height:28px;border-radius:6px;border:none;
+    background:var(--glass);color:var(--muted);cursor:pointer;font-size:16px;
+    display:grid;place-items:center;transition:all .2s;flex-shrink:0;
+  }
+  .panel-close:hover{background:rgba(255,255,255,.1);color:var(--text)}
+  .panel-body{padding:16px 20px;overflow-y:auto;flex:1}
+  .panel-body::-webkit-scrollbar{width:4px}
+  .panel-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+  .panel-section{margin-bottom:16px}
+  .panel-section h4{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;font-weight:600}
+  .panel-section p{font-size:13px;line-height:1.6;color:rgba(228,228,231,.8)}
+  .tag{
+    display:inline-block;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:500;
+    font-family:'JetBrains Mono',monospace;margin:2px 3px 2px 0;
+  }
+  .tag.dep{background:rgba(129,140,248,.12);color:var(--accent);border:1px solid rgba(129,140,248,.2)}
+  .tag.cls{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+  .tag.fn{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+  .tag.file{background:rgba(244,114,182,.12);color:var(--pink);border:1px solid rgba(244,114,182,.2)}
+
+  /* ── Stats Bar ── */
+  .stats{
+    position:fixed;bottom:20px;right:20px;z-index:100;
+    display:flex;gap:8px;
+  }
+  .stat{
+    background:rgba(15,15,22,.85);backdrop-filter:blur(12px);
+    border:1px solid var(--border);border-radius:10px;padding:10px 16px;
+    text-align:center;min-width:72px;
+  }
+  .stat-val{font-size:20px;font-weight:700;letter-spacing:-.5px}
+  .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+
+  /* ── Tooltip ── */
+  .tooltip{
+    position:fixed;z-index:200;pointer-events:none;
+    background:rgba(20,20,30,.95);backdrop-filter:blur(12px);
+    border:1px solid var(--border);border-radius:8px;padding:8px 12px;
+    font-size:12px;font-weight:500;opacity:0;transition:opacity .15s;
+    white-space:nowrap;
+  }
+  .tooltip.show{opacity:1}
+  .tooltip .tt-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+  /* ── Search ── */
+  .search{
+    position:relative;margin-left:16px;
+  }
+  .search input{
+    width:200px;padding:7px 12px 7px 32px;border-radius:8px;
+    border:1px solid var(--border);background:var(--glass);
+    color:var(--text);font-size:12px;font-family:inherit;
+    outline:none;transition:all .2s;
+  }
+  .search input:focus{border-color:rgba(129,140,248,.5);background:rgba(255,255,255,.08);width:260px}
+  .search input::placeholder{color:var(--muted)}
+  .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">PB</div>
+  <div>
+    <h1>pbtracker</h1>
+    <div class="subtitle">Architecture Graph</div>
+  </div>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Search modules…">
+  </div>
+  <div class="controls">
+    <button class="btn active" id="btnImport" onclick="toggleEdgeType('import')">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span> Imports
+    </button>
+    <button class="btn active" id="btnData" onclick="toggleEdgeType('data')">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></span> Data Flow
+    </button>
+    <button class="btn" id="btnReset" onclick="resetView()">⟲ Reset</button>
+  </div>
+</div>
+
+<canvas id="graph"></canvas>
+
+<div class="legend">
+  <h3>Node Types</h3>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Entry Point</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Core Module</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>Detector</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Utility / Script</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div>Data / Stub</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Model Weight</div>
+  <div class="sep"></div>
+  <h3>Edge Types</h3>
+  <div class="legend-item"><div class="legend-line" style="background:var(--accent)"></div>Import / Uses</div>
+  <div class="legend-item"><div class="legend-line" style="background:var(--amber);opacity:.6"></div>Data Flow (pkl)</div>
+</div>
+
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div class="panel-icon" id="panelIcon"></div>
+    <div>
+      <h2 id="panelTitle"></h2>
+      <div class="path" id="panelPath"></div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-val" id="statModules">0</div><div class="stat-label">Modules</div></div>
+  <div class="stat"><div class="stat-val" id="statEdges">0</div><div class="stat-label">Edges</div></div>
+  <div class="stat"><div class="stat-val" id="statDeps">0</div><div class="stat-label">Ext. Deps</div></div>
+</div>
+
+<div class="tooltip" id="tooltip"><span id="ttText"></span><div class="tt-sub" id="ttSub"></div></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  GRAPH DATA — pbtracker architecture
+// ═══════════════════════════════════════════════
+
+const NODES = [
+  // ─── Entry & Core ───
+  {
+    id: 'main', label: 'main.py', type: 'entry',
+    path: 'main.py',
+    desc: 'Main pipeline entry point. Orchestrates: video read → court detection → player tracking → ball tracking → interpolation → annotation → output.',
+    classes: [], functions: ['main()'],
+    deps: ['cv2', 'os', 'glob'],
+    size: 42,
+  },
+  // ─── Trackers ───
+  {
+    id: 'player_tracker', label: 'PlayerTracker', type: 'core',
+    path: 'trackers/player_tracker.py',
+    desc: 'Detects & tracks human players via YOLOv8 persistent tracking with court boundary polygon filtering (keypoints [0,2,11,9]).',
+    classes: ['PlayerTracker'], functions: ['detect_frames()', 'draw_bboxes()'],
+    deps: ['ultralytics', 'cv2', 'numpy', 'pickle'],
+    size: 38,
+  },
+  {
+    id: 'ball_tracker', label: 'BallTracker', type: 'core',
+    path: 'trackers/ball_tracker.py',
+    desc: 'Detects ball per-frame with custom YOLOv5 model (conf=0.15). Interpolates missing detections via Pandas linear interpolation + backfill.',
+    classes: ['BallTracker'], functions: ['detect_frames()', 'interpolate_ball_positions()', 'draw_bboxes()'],
+    deps: ['ultralytics', 'cv2', 'pandas', 'pickle'],
+    size: 36,
+  },
+  // ─── Detectors ───
+  {
+    id: 'court_detector', label: 'ManualCourtDetector', type: 'detector',
+    path: 'court_line_detector/manual_court_selector.py',
+    desc: 'Interactive GUI for clicking 12 court keypoints on Frame 0 via OpenCV window. Saves/loads from pickle stub.',
+    classes: ['ManualCourtDetector'], functions: ['get_keypoints()', 'draw_keypoints_on_video()'],
+    deps: ['cv2', 'pickle'],
+    size: 34,
+  },
+  // ─── Healers / Post-processors ───
+  {
+    id: 'deep_reid', label: 'DeepReID Healer', type: 'utility',
+    path: 'deep_reid_healer.py',
+    desc: 'Neural person Re-ID track stitcher. Uses headless ResNet50 → 2048-D embeddings → cosine similarity matching. Fixes fragmented player IDs.',
+    classes: ['DeepReIDExtractor'], functions: ['run_healer()', 'build_baseline_profiles()', 'match_fragments()', 'segment_tracks()'],
+    deps: ['torch', 'torchvision', 'cv2', 'numpy', 'tqdm', 'argparse'],
+    size: 40,
+  },
+  {
+    id: 'tracklet_merger', label: 'Tracklet Merger', type: 'utility',
+    path: 'tracklet_merger.py',
+    desc: 'Lightweight heuristic track stitcher. Three-gate criteria: temporal proximity, spatial (Euclidean centroid), visual (HSV histogram correlation).',
+    classes: [], functions: ['run_merger()', 'find_merge_candidates()', 'score_visual_similarity()', 'build_tracklet_segments()'],
+    deps: ['cv2', 'numpy', 'argparse', 'pickle'],
+    size: 36,
+  },
+  // ─── Debug / Test Scripts ───
+  {
+    id: 'yolo_inference', label: 'YOLO Inference', type: 'utility',
+    path: 'yolo_inference.py',
+    desc: 'Quick standalone YOLOv8x inference test on first video frame. Outputs first_frame_detection.jpg.',
+    classes: [], functions: ['main()'],
+    deps: ['ultralytics', 'cv2', 'os', 'glob'],
+    size: 28,
+  },
+  {
+    id: 'debug_players', label: 'Debug Players', type: 'utility',
+    path: 'debug_players.py',
+    desc: 'Court polygon debug visualizer. Overlays boundary polygon + player foot-point polygon tests on Frame 0. Uses keypoints [0,1,2,3] (differs from player_tracker).',
+    classes: [], functions: ['main()'],
+    deps: ['cv2', 'numpy', 'pickle'],
+    size: 28,
+  },
+  // ─── Data Stubs ───
+  {
+    id: 'stub_players', label: 'player_detections.pkl', type: 'data',
+    path: 'tracker_stubs/player_detections.pkl',
+    desc: 'Cached player tracking data (192 KB). Per-frame dict of track_id → {bbox, is_on_court}. Validated by frame count on reload.',
+    classes: [], functions: [], deps: [], size: 24,
+  },
+  {
+    id: 'stub_ball', label: 'ball_detections.pkl', type: 'data',
+    path: 'tracker_stubs/ball_detections.pkl',
+    desc: 'Cached ball detection data (54 KB). Per-frame dict with single ball bbox. Validated by frame count on reload.',
+    classes: [], functions: [], deps: [], size: 24,
+  },
+  {
+    id: 'stub_court', label: 'court_keypoints.pkl', type: 'data',
+    path: 'tracker_stubs/court_keypoints.pkl',
+    desc: '12 court keypoints (111 bytes). Clicked by user via ManualCourtDetector GUI. Used for boundary filtering and visualization.',
+    classes: [], functions: [], deps: [], size: 22,
+  },
+  // ─── Model Weights ───
+  {
+    id: 'model_yolov8', label: 'yolov8x.pt', type: 'model',
+    path: 'yolov8x.pt',
+    desc: 'Pretrained YOLOv8x model (137 MB). Used by PlayerTracker for person detection (class 0) and yolo_inference test.',
+    classes: [], functions: [], deps: [], size: 26,
+  },
+  {
+    id: 'model_yolov5', label: 'yolo5_last.pt', type: 'model',
+    path: 'models/yolo5_last.pt',
+    desc: 'Custom-trained YOLOv5 model for ball detection (5.4 MB). Used by BallTracker with conf threshold 0.15.',
+    classes: [], functions: [], deps: [], size: 24,
+  },
+  {
+    id: 'model_best', label: 'best.pt', type: 'model',
+    path: 'best.pt',
+    desc: 'Trained model weights (52 MB). ⚠️ Not referenced by any current code — likely from previous training run or experiment.',
+    classes: [], functions: [], deps: [], size: 24,
+  },
+];
+
+const EDGES = [
+  // ─── Import edges (main → modules) ───
+  { from: 'main', to: 'player_tracker', type: 'import', label: 'imports PlayerTracker' },
+  { from: 'main', to: 'ball_tracker', type: 'import', label: 'imports BallTracker' },
+  { from: 'main', to: 'court_detector', type: 'import', label: 'imports ManualCourtDetector' },
+
+  // ─── Import edges (modules → models) ───
+  { from: 'player_tracker', to: 'model_yolov8', type: 'import', label: 'loads model' },
+  { from: 'ball_tracker', to: 'model_yolov5', type: 'import', label: 'loads model' },
+  { from: 'yolo_inference', to: 'model_yolov8', type: 'import', label: 'loads model' },
+
+  // ─── Data flow edges (write → stub) ───
+  { from: 'court_detector', to: 'stub_court', type: 'data', label: 'writes keypoints' },
+  { from: 'player_tracker', to: 'stub_players', type: 'data', label: 'writes/reads detections' },
+  { from: 'ball_tracker', to: 'stub_ball', type: 'data', label: 'writes/reads detections' },
+
+  // ─── Data flow edges (stub → consumers) ───
+  { from: 'stub_court', to: 'player_tracker', type: 'data', label: 'reads keypoints → polygon' },
+  { from: 'stub_court', to: 'debug_players', type: 'data', label: 'reads keypoints' },
+  { from: 'stub_players', to: 'deep_reid', type: 'data', label: 'reads → heals → writes' },
+  { from: 'stub_players', to: 'tracklet_merger', type: 'data', label: 'reads → merges → writes' },
+  { from: 'stub_players', to: 'debug_players', type: 'data', label: 'reads detections' },
+  { from: 'stub_players', to: 'main', type: 'data', label: 'reads for annotation' },
+  { from: 'stub_ball', to: 'main', type: 'data', label: 'reads for annotation' },
+];
+
+// ─── Color mapping ───
+const COLORS = {
+  entry:    { fill: '#818cf8', glow: 'rgba(129,140,248,.35)', text: '#818cf8' },
+  core:     { fill: '#34d399', glow: 'rgba(52,211,153,.30)',  text: '#34d399' },
+  detector: { fill: '#22d3ee', glow: 'rgba(34,211,238,.30)',  text: '#22d3ee' },
+  utility:  { fill: '#fb923c', glow: 'rgba(251,146,60,.30)',  text: '#fb923c' },
+  data:     { fill: '#fb7185', glow: 'rgba(251,113,133,.30)', text: '#fb7185' },
+  model:    { fill: '#f472b6', glow: 'rgba(244,114,182,.30)', text: '#f472b6' },
+};
+
+const EDGE_COLORS = {
+  import: { stroke: 'rgba(129,140,248,.55)', arrow: 'rgba(129,140,248,.8)' },
+  data:   { stroke: 'rgba(251,191,36,.40)',   arrow: 'rgba(251,191,36,.7)' },
+};
+
+// ═══════════════════════════════════════════════
+//  GRAPH ENGINE
+// ═══════════════════════════════════════════════
+
+const canvas = document.getElementById('graph');
+const ctx = canvas.getContext('2d');
+let W, H, dpr;
+let offsetX = 0, offsetY = 0, scale = 1;
+let dragging = null, panning = false, panStart = { x: 0, y: 0 };
+let hoveredNode = null, selectedNode = null;
+let showImports = true, showData = true;
+let searchTerm = '';
+let animT = 0;
+
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ─── Initial positions (clustered layout) ───
+function initPositions() {
+  const cx = W / 2, cy = H / 2;
+  const positions = {
+    main:            { x: cx,       y: cy - 60 },
+    player_tracker:  { x: cx - 200, y: cy + 80 },
+    ball_tracker:    { x: cx + 200, y: cy + 80 },
+    court_detector:  { x: cx,       y: cy + 200 },
+    deep_reid:       { x: cx - 380, y: cy + 240 },
+    tracklet_merger: { x: cx - 380, y: cy + 80 },
+    yolo_inference:  { x: cx + 380, y: cy - 80 },
+    debug_players:   { x: cx + 380, y: cy + 240 },
+    stub_players:    { x: cx - 200, y: cy + 340 },
+    stub_ball:       { x: cx + 200, y: cy + 340 },
+    stub_court:      { x: cx,       y: cy + 400 },
+    model_yolov8:    { x: cx - 120, y: cy - 200 },
+    model_yolov5:    { x: cx + 180, y: cy - 180 },
+    model_best:      { x: cx + 360, y: cy - 200 },
+  };
+  NODES.forEach(n => {
+    const p = positions[n.id] || { x: cx + (Math.random() - .5) * 400, y: cy + (Math.random() - .5) * 400 };
+    n.x = p.x; n.y = p.y;
+    n.vx = 0; n.vy = 0;
+    n.targetX = p.x; n.targetY = p.y;
+  });
+}
+initPositions();
+
+// ─── Force simulation ───
+function simulate() {
+  const nodes = NODES;
+  const alpha = 0.08;
+
+  // Repulsion between nodes
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      let dx = nodes[j].x - nodes[i].x;
+      let dy = nodes[j].y - nodes[i].y;
+      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      let minDist = (nodes[i].size + nodes[j].size) * 1.8;
+      if (dist < minDist) {
+        let force = (minDist - dist) / dist * 0.3;
+        nodes[i].vx -= dx * force;
+        nodes[i].vy -= dy * force;
+        nodes[j].vx += dx * force;
+        nodes[j].vy += dy * force;
+      }
+    }
+  }
+
+  // Spring attraction along edges
+  EDGES.forEach(e => {
+    if (e.type === 'import' && !showImports) return;
+    if (e.type === 'data' && !showData) return;
+    const a = nodes.find(n => n.id === e.from);
+    const b = nodes.find(n => n.id === e.to);
+    if (!a || !b) return;
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    let target = 180;
+    let force = (dist - target) / dist * 0.005;
+    a.vx += dx * force;
+    a.vy += dy * force;
+    b.vx -= dx * force;
+    b.vy -= dy * force;
+  });
+
+  // Centering force
+  nodes.forEach(n => {
+    n.vx += (W / 2 - n.x) * 0.0003;
+    n.vy += (H / 2 - n.y) * 0.0003;
+  });
+
+  // Apply velocity with damping
+  nodes.forEach(n => {
+    if (n === dragging) return;
+    n.vx *= 0.85;
+    n.vy *= 0.85;
+    n.x += n.vx;
+    n.y += n.vy;
+  });
+}
+
+// ─── Drawing ───
+function drawEdge(e, t) {
+  const a = NODES.find(n => n.id === e.from);
+  const b = NODES.find(n => n.id === e.to);
+  if (!a || !b) return;
+
+  const color = EDGE_COLORS[e.type];
+  const sx = a.x, sy = a.y, ex = b.x, ey = b.y;
+  const dx = ex - sx, dy = ey - sy;
+  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+  const nx = dx / dist, ny = dy / dist;
+
+  // Shorten to node edge
+  const rA = a.size + 4, rB = b.size + 4;
+  const x1 = sx + nx * rA, y1 = sy + ny * rA;
+  const x2 = ex - nx * rB, y2 = ey - ny * rB;
+
+  // Dim if search active and neither node matches
+  let alpha = 1;
+  if (searchTerm) {
+    const aMatch = a.label.toLowerCase().includes(searchTerm);
+    const bMatch = b.label.toLowerCase().includes(searchTerm);
+    alpha = (aMatch || bMatch) ? 1 : 0.08;
+  }
+  if (selectedNode && a.id !== selectedNode.id && b.id !== selectedNode.id) {
+    alpha = 0.1;
+  }
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color.stroke;
+  ctx.lineWidth = e.type === 'data' ? 1.5 : 2;
+  if (e.type === 'data') ctx.setLineDash([6, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Animated dot along edge
+  const progress = ((t * 0.0008 + (a.x * 0.01 + b.y * 0.01)) % 1 + 1) % 1;
+  const dotX = x1 + (x2 - x1) * progress;
+  const dotY = y1 + (y2 - y1) * progress;
+  ctx.beginPath();
+  ctx.arc(dotX, dotY, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = color.arrow;
+  ctx.fill();
+
+  // Arrowhead
+  const arrowSize = 8;
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - arrowSize * Math.cos(angle - 0.35), y2 - arrowSize * Math.sin(angle - 0.35));
+  ctx.lineTo(x2 - arrowSize * Math.cos(angle + 0.35), y2 - arrowSize * Math.sin(angle + 0.35));
+  ctx.closePath();
+  ctx.fillStyle = color.arrow;
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawNode(node, t) {
+  const c = COLORS[node.type];
+  const r = node.size;
+  const isHovered = hoveredNode === node;
+  const isSelected = selectedNode === node;
+
+  // Dim if search active and doesn't match
+  let alpha = 1;
+  if (searchTerm && !node.label.toLowerCase().includes(searchTerm)) {
+    alpha = 0.12;
+  }
+  if (selectedNode && selectedNode !== node) {
+    // Check if connected
+    const connected = EDGES.some(e =>
+      ((e.type === 'import' && showImports) || (e.type === 'data' && showData)) &&
+      (e.from === selectedNode.id && e.to === node.id || e.to === selectedNode.id && e.from === node.id)
+    );
+    alpha = connected ? 1 : 0.15;
+  }
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  // Glow
+  if (isHovered || isSelected) {
+    const glow = ctx.createRadialGradient(node.x, node.y, r * 0.5, node.x, node.y, r * 3);
+    glow.addColorStop(0, c.glow);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(node.x - r * 3, node.y - r * 3, r * 6, r * 6);
+  }
+
+  // Pulsing ring for entry point
+  if (node.type === 'entry') {
+    const pulseR = r + 6 + Math.sin(t * 0.003) * 3;
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, pulseR, 0, Math.PI * 2);
+    ctx.strokeStyle = c.fill;
+    ctx.globalAlpha = alpha * (0.15 + Math.sin(t * 0.003) * 0.1);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.globalAlpha = alpha;
+  }
+
+  // Node body
+  ctx.beginPath();
+  if (node.type === 'data') {
+    // Diamond shape for data
+    ctx.moveTo(node.x, node.y - r);
+    ctx.lineTo(node.x + r, node.y);
+    ctx.lineTo(node.x, node.y + r);
+    ctx.lineTo(node.x - r, node.y);
+    ctx.closePath();
+  } else if (node.type === 'model') {
+    // Rounded rect for models
+    const hr = r * 0.8;
+    roundRect(ctx, node.x - r, node.y - hr, r * 2, hr * 2, 8);
+  } else {
+    ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+  }
+
+  // Fill
+  const grad = ctx.createRadialGradient(node.x - r * 0.3, node.y - r * 0.3, 0, node.x, node.y, r);
+  grad.addColorStop(0, lighten(c.fill, 0.2));
+  grad.addColorStop(1, c.fill);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Border
+  ctx.strokeStyle = isHovered || isSelected ? '#fff' : 'rgba(255,255,255,.2)';
+  ctx.lineWidth = isHovered || isSelected ? 2.5 : 1;
+  ctx.stroke();
+
+  // Icon / letter
+  ctx.fillStyle = 'rgba(0,0,0,.6)';
+  ctx.font = `${Math.round(r * 0.55)}px 'Inter'`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const icons = { entry: '⚡', core: '◉', detector: '◎', utility: '⚙', data: '◆', model: '⬡' };
+  ctx.fillText(icons[node.type] || '●', node.x, node.y + 1);
+
+  // Label
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  ctx.font = `600 11px 'Inter'`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(node.label, node.x, node.y + r + 8);
+
+  // Type badge
+  ctx.fillStyle = c.text;
+  ctx.globalAlpha = alpha * 0.5;
+  ctx.font = `500 9px 'JetBrains Mono'`;
+  ctx.fillText(node.type.toUpperCase(), node.x, node.y + r + 22);
+
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function lighten(hex, amount) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,r+amount*255)},${Math.min(255,g+amount*255)},${Math.min(255,b+amount*255)})`;
+}
+
+// ─── Grid background ───
+function drawGrid() {
+  const gridSize = 40 * scale;
+  const ox = (offsetX * scale) % gridSize;
+  const oy = (offsetY * scale) % gridSize;
+  ctx.strokeStyle = 'rgba(255,255,255,.025)';
+  ctx.lineWidth = 1;
+  for (let x = ox; x < W; x += gridSize) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = oy; y < H; y += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+}
+
+// ─── Main render loop ───
+function render(t) {
+  animT = t;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  const bgGrad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*0.7);
+  bgGrad.addColorStop(0, '#0f0f1a');
+  bgGrad.addColorStop(1, '#0a0a0f');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  drawGrid();
+
+  // Apply transform
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  // scale around center removed for simplicity — applied to node positions if needed
+
+  simulate();
+
+  // Draw edges
+  EDGES.forEach(e => {
+    if (e.type === 'import' && !showImports) return;
+    if (e.type === 'data' && !showData) return;
+    drawEdge(e, t);
+  });
+
+  // Draw nodes
+  NODES.forEach(n => drawNode(n, t));
+
+  ctx.restore();
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+// ─── Interaction ───
+function screenToWorld(sx, sy) {
+  return { x: sx - offsetX, y: sy - offsetY };
+}
+
+function findNode(mx, my) {
+  const p = screenToWorld(mx, my);
+  for (let i = NODES.length - 1; i >= 0; i--) {
+    const n = NODES[i];
+    const dx = p.x - n.x, dy = p.y - n.y;
+    if (dx*dx + dy*dy < n.size * n.size * 1.5) return n;
+  }
+  return null;
+}
+
+canvas.addEventListener('mousedown', e => {
+  const node = findNode(e.clientX, e.clientY);
+  if (node) {
+    dragging = node;
+    canvas.classList.add('grabbing');
+  } else {
+    panning = true;
+    panStart = { x: e.clientX - offsetX, y: e.clientY - offsetY };
+    canvas.classList.add('grabbing');
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (dragging) {
+    const p = screenToWorld(e.clientX, e.clientY);
+    dragging.x = p.x;
+    dragging.y = p.y;
+    dragging.vx = 0;
+    dragging.vy = 0;
+  } else if (panning) {
+    offsetX = e.clientX - panStart.x;
+    offsetY = e.clientY - panStart.y;
+  } else {
+    const node = findNode(e.clientX, e.clientY);
+    hoveredNode = node;
+    canvas.style.cursor = node ? 'pointer' : 'grab';
+
+    const tt = document.getElementById('tooltip');
+    if (node) {
+      tt.classList.add('show');
+      tt.style.left = (e.clientX + 16) + 'px';
+      tt.style.top = (e.clientY - 10) + 'px';
+      document.getElementById('ttText').textContent = node.label;
+      document.getElementById('ttSub').textContent = node.path;
+    } else {
+      tt.classList.remove('show');
+    }
+  }
+});
+
+canvas.addEventListener('mouseup', e => {
+  if (dragging && !panning) {
+    // If it was a click (not a drag), open panel
+    const p = screenToWorld(e.clientX, e.clientY);
+    const dx = p.x - dragging.x, dy = p.y - dragging.y;
+    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
+      selectedNode = dragging;
+      openPanel(dragging);
+    }
+  }
+  dragging = null;
+  panning = false;
+  canvas.classList.remove('grabbing');
+});
+
+canvas.addEventListener('dblclick', e => {
+  const node = findNode(e.clientX, e.clientY);
+  if (node) {
+    selectedNode = node;
+    openPanel(node);
+  }
+});
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  // Simple zoom by scaling node sizes
+}, { passive: false });
+
+// Click on canvas background to deselect
+canvas.addEventListener('click', e => {
+  const node = findNode(e.clientX, e.clientY);
+  if (!node) {
+    selectedNode = null;
+    closePanel();
+  }
+});
+
+// ─── Panel ───
+function openPanel(node) {
+  const panel = document.getElementById('panel');
+  const c = COLORS[node.type];
+
+  document.getElementById('panelIcon').style.background = `linear-gradient(135deg, ${c.fill}, ${lighten(c.fill, -0.15)})`;
+  document.getElementById('panelIcon').textContent = node.label.charAt(0).toUpperCase();
+  document.getElementById('panelTitle').textContent = node.label;
+  document.getElementById('panelPath').textContent = node.path;
+
+  let html = '';
+
+  // Description
+  html += `<div class="panel-section"><h4>Description</h4><p>${node.desc}</p></div>`;
+
+  // Classes
+  if (node.classes.length) {
+    html += `<div class="panel-section"><h4>Classes</h4><div>`;
+    node.classes.forEach(c => html += `<span class="tag cls">${c}</span>`);
+    html += `</div></div>`;
+  }
+
+  // Functions
+  if (node.functions.length) {
+    html += `<div class="panel-section"><h4>Functions</h4><div>`;
+    node.functions.forEach(f => html += `<span class="tag fn">${f}</span>`);
+    html += `</div></div>`;
+  }
+
+  // Dependencies
+  if (node.deps.length) {
+    html += `<div class="panel-section"><h4>External Dependencies</h4><div>`;
+    node.deps.forEach(d => html += `<span class="tag dep">${d}</span>`);
+    html += `</div></div>`;
+  }
+
+  // Connected nodes
+  const incoming = EDGES.filter(e => e.to === node.id).map(e => {
+    const src = NODES.find(n => n.id === e.from);
+    return { node: src, label: e.label, type: e.type };
+  });
+  const outgoing = EDGES.filter(e => e.from === node.id).map(e => {
+    const tgt = NODES.find(n => n.id === e.to);
+    return { node: tgt, label: e.label, type: e.type };
+  });
+
+  if (incoming.length) {
+    html += `<div class="panel-section"><h4>Incoming</h4><div>`;
+    incoming.forEach(c => {
+      if (c.node) html += `<span class="tag file" style="cursor:pointer" onclick="selectById('${c.node.id}')">${c.node.label} → ${c.label}</span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if (outgoing.length) {
+    html += `<div class="panel-section"><h4>Outgoing</h4><div>`;
+    outgoing.forEach(c => {
+      if (c.node) html += `<span class="tag file" style="cursor:pointer" onclick="selectById('${c.node.id}')">${c.label} → ${c.node.label}</span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  document.getElementById('panelBody').innerHTML = html;
+  panel.classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+}
+
+function selectById(id) {
+  const node = NODES.find(n => n.id === id);
+  if (node) {
+    selectedNode = node;
+    openPanel(node);
+  }
+}
+
+// ─── Controls ───
+function toggleEdgeType(type) {
+  if (type === 'import') {
+    showImports = !showImports;
+    document.getElementById('btnImport').classList.toggle('active');
+  } else {
+    showData = !showData;
+    document.getElementById('btnData').classList.toggle('active');
+  }
+}
+
+function resetView() {
+  offsetX = 0; offsetY = 0; scale = 1;
+  selectedNode = null;
+  closePanel();
+  initPositions();
+}
+
+// ─── Search ───
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+});
+
+// ─── Stats ───
+document.getElementById('statModules').textContent = NODES.filter(n => !['data','model'].includes(n.type)).length;
+document.getElementById('statEdges').textContent = EDGES.length;
+const allDeps = new Set();
+NODES.forEach(n => n.deps.forEach(d => allDeps.add(d)));
+document.getElementById('statDeps').textContent = allDeps.size;
+</script>
+</body>
+</html>
