@@ -1,16 +1,29 @@
-# Python-generated files
+# Python
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
+.venv/
 
-# Virtual environments
-.venv
+# OS
 .DS_Store
-*.mp4
+
+# Large model weights
 *.pt
-*.pkl
-*.lock
+
+# Cached tracking data
+tracker_stubs/*.pkl
+
+# Video files
+input_videos/*.mp4
+input_videos/*.avi
+input_videos/*.mov
+output_videos/*.mp4
+
+# Lock file
 uv.lock
+
+# Debug artifacts
+debug/*.jpg
