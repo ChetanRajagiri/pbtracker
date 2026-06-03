@@ -42,6 +42,9 @@ class ManualCourtDetector:
                 break
                 
         cv2.destroyAllWindows()
+        # On some platforms (especially macOS), destroyAllWindows needs extra waitKey pump cycles to close
+        for _ in range(5):
+            cv2.waitKey(1)
         
         if len(keypoints) == 12:
             if stub_path:

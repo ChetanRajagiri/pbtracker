@@ -27,3 +27,4 @@ uv.lock
 
 # Debug artifacts
 debug/*.jpg
+*.jpg
