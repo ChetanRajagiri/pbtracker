@@ -78,17 +78,17 @@ def main():
         print("Player detections cache not found. Running tracking over video stream...")
         player_detections = []
         cap = cv2.VideoCapture(video_path)
-        frame_idx = 0
+        from tqdm import tqdm
+        pbar = tqdm(total=total_frames, desc="Tracking players", unit="frame")
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
             # detect_frames on a single-frame list
-            detection_dict = player_tracker.detect_frames([frame], read_from_stub=False, court_keypoints_path=court_stub_path)[0]
+            detection_dict = player_tracker.detect_frames([frame], read_from_stub=False, court_keypoints_path=court_stub_path, verbose=False)[0]
             player_detections.append(detection_dict)
-            frame_idx += 1
-            if frame_idx % 100 == 0:
-                print(f"Tracked players on {frame_idx}/{total_frames} frames...")
+            pbar.update(1)
+        pbar.close()
         cap.release()
         
         # Save to stub
@@ -113,17 +113,17 @@ def main():
         print("Ball detections cache not found. Running ball detection over video stream...")
         ball_detections = []
         cap = cv2.VideoCapture(video_path)
-        frame_idx = 0
+        from tqdm import tqdm
+        pbar = tqdm(total=total_frames, desc="Tracking ball", unit="frame")
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
             # detect_frames on a single-frame list
-            detection_dict = ball_tracker.detect_frames([frame], read_from_stub=False)[0]
+            detection_dict = ball_tracker.detect_frames([frame], read_from_stub=False, verbose=False)[0]
             ball_detections.append(detection_dict)
-            frame_idx += 1
-            if frame_idx % 100 == 0:
-                print(f"Detected ball on {frame_idx}/{total_frames} frames...")
+            pbar.update(1)
+        pbar.close()
         cap.release()
         
         # Save to stub
@@ -168,6 +168,8 @@ def main():
 
     cap = cv2.VideoCapture(video_path)
     frame_idx = 0
+    from tqdm import tqdm
+    pbar = tqdm(total=total_frames, desc="Rendering annotated video", unit="frame")
     
     while True:
         ret, frame = cap.read()
@@ -222,10 +224,9 @@ def main():
         # Write frame to final video
         out.write(annotated_frame)
         frame_idx += 1
-        
-        if frame_idx % 100 == 0:
-            print(f"Rendered and saved annotated frames: {frame_idx}/{total_frames}...")
+        pbar.update(1)
 
+    pbar.close()
     cap.release()
     out.release()
     print(f"Saved annotated video to: {os.path.abspath(output_path)}")

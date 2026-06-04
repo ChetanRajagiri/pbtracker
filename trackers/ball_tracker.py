@@ -48,24 +48,27 @@ class BallTracker:
                 
         return interpolated_positions
 
-    def detect_frames(self, frames, read_from_stub=False, stub_path=None):
+    def detect_frames(self, frames, read_from_stub=False, stub_path=None, verbose=True):
         # 1. Load from stub if requested and exists (with frame count validation)
         if read_from_stub and stub_path and os.path.exists(stub_path):
-            print(f"Loading ball tracking data from stub: {stub_path}")
+            if verbose:
+                print(f"Loading ball tracking data from stub: {stub_path}")
             with open(stub_path, 'rb') as f:
                 cached_data = pickle.load(f)
                 if len(cached_data) == len(frames):
                     return cached_data
                 else:
-                    print(f"[WARNING] Cache mismatch detected. Stale tracking stub contains fewer frames than the active input video. Forcing full YOLO re-inference...")
+                    if verbose:
+                        print(f"[WARNING] Cache mismatch detected. Stale tracking stub contains fewer frames than the active input video. Forcing full YOLO re-inference...")
 
-        print("Running ball detection on frames...")
+        if verbose:
+            print("Running ball detection on frames...")
         ball_detections = []
 
         # 2. Run prediction frame by frame
         for i, frame in enumerate(frames):
             # Run prediction with conf=0.15
-            results = self.model.predict(frame, conf=0.15)[0]
+            results = self.model.predict(frame, conf=0.15, verbose=verbose)[0]
             
             frame_dict = {}
             # If a ball is detected, store the first detection (usually highest confidence) under key 1
@@ -75,7 +78,7 @@ class BallTracker:
                 frame_dict[1] = coords
             
             ball_detections.append(frame_dict)
-            if (i + 1) % 10 == 0 or (i + 1) == len(frames):
+            if verbose and ((i + 1) % 10 == 0 or (i + 1) == len(frames)):
                 print(f"Processed {i + 1}/{len(frames)} frames for ball detection")
 
         # 3. Save to stub if path is provided
@@ -84,7 +87,8 @@ class BallTracker:
             if stub_dir and not os.path.exists(stub_dir):
                 os.makedirs(stub_dir)
             
-            print(f"Saving ball tracking data to stub: {stub_path}")
+            if verbose:
+                print(f"Saving ball tracking data to stub: {stub_path}")
             with open(stub_path, 'wb') as f:
                 pickle.dump(ball_detections, f)
 

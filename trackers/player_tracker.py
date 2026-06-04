@@ -9,21 +9,24 @@ class PlayerTracker:
         print(f"Initializing PlayerTracker with model: {model_path}")
         self.model = YOLO(model_path)
 
-    def detect_frames(self, frames, read_from_stub=False, stub_path=None, court_keypoints_path="tracker_stubs/court_keypoints.pkl"):
+    def detect_frames(self, frames, read_from_stub=False, stub_path=None, court_keypoints_path="tracker_stubs/court_keypoints.pkl", verbose=True):
         # 1. Load from stub if requested and exists (with frame count validation)
         if read_from_stub and stub_path and os.path.exists(stub_path):
-            print(f"Loading player tracking data from stub: {stub_path}")
+            if verbose:
+                print(f"Loading player tracking data from stub: {stub_path}")
             with open(stub_path, 'rb') as f:
                 cached_data = pickle.load(f)
                 if len(cached_data) == len(frames):
                     return cached_data
                 else:
-                    print(f"[WARNING] Cache mismatch detected. Stale tracking stub contains fewer frames than the active input video. Forcing full YOLO re-inference...")
+                    if verbose:
+                        print(f"[WARNING] Cache mismatch detected. Stale tracking stub contains fewer frames than the active input video. Forcing full YOLO re-inference...")
 
         # Load court keypoints to define boundaries
         polygon = None
         if court_keypoints_path and os.path.exists(court_keypoints_path):
-            print(f"Loading court keypoints for boundary filtering: {court_keypoints_path}")
+            if verbose:
+                print(f"Loading court keypoints for boundary filtering: {court_keypoints_path}")
             with open(court_keypoints_path, 'rb') as f:
                 court_keypoints = pickle.load(f)
             if len(court_keypoints) >= 12:
@@ -33,17 +36,20 @@ class PlayerTracker:
                 corner4 = court_keypoints[9]   # Bottom-Left Near Baseline
                 polygon = np.array([corner1, corner2, corner3, corner4], dtype=np.int32)
             else:
-                print(f"[WARNING] Insufficient court keypoints ({len(court_keypoints)}) to define polygon. Skipping filtering.")
+                if verbose:
+                    print(f"[WARNING] Insufficient court keypoints ({len(court_keypoints)}) to define polygon. Skipping filtering.")
         else:
-            print(f"[WARNING] No court keypoints found at {court_keypoints_path}. Skipping boundary filtering.")
+            if verbose:
+                print(f"[WARNING] No court keypoints found at {court_keypoints_path}. Skipping boundary filtering.")
 
-        print("Running object tracking on frames...")
+        if verbose:
+            print("Running object tracking on frames...")
         player_detections = []
 
         # 2. Run tracking frame by frame
         for i, frame in enumerate(frames):
             # Run tracking with human class only (class 0)
-            results = self.model.track(frame, persist=True, classes=[0])[0]
+            results = self.model.track(frame, persist=True, classes=[0], verbose=verbose)[0]
             
             frame_dict = {}
             for box in results.boxes:
@@ -68,7 +74,7 @@ class PlayerTracker:
                     }
             
             player_detections.append(frame_dict)
-            if (i + 1) % 10 == 0 or (i + 1) == len(frames):
+            if verbose and ((i + 1) % 10 == 0 or (i + 1) == len(frames)):
                 print(f"Tracked {i + 1}/{len(frames)} frames")
 
         # 3. Save to stub if path is provided
@@ -77,7 +83,8 @@ class PlayerTracker:
             if stub_dir and not os.path.exists(stub_dir):
                 os.makedirs(stub_dir)
             
-            print(f"Saving player tracking data to stub: {stub_path}")
+            if verbose:
+                print(f"Saving player tracking data to stub: {stub_path}")
             with open(stub_path, 'wb') as f:
                 pickle.dump(player_detections, f)
 
