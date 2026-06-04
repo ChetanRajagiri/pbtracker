@@ -9,7 +9,7 @@ class PlayerTracker:
         print(f"Initializing PlayerTracker with model: {model_path}")
         self.model = YOLO(model_path)
 
-    def detect_frames(self, frames, read_from_stub=False, stub_path=None):
+    def detect_frames(self, frames, read_from_stub=False, stub_path=None, court_keypoints_path="tracker_stubs/court_keypoints.pkl"):
         # 1. Load from stub if requested and exists (with frame count validation)
         if read_from_stub and stub_path and os.path.exists(stub_path):
             print(f"Loading player tracking data from stub: {stub_path}")
@@ -21,9 +21,8 @@ class PlayerTracker:
                     print(f"[WARNING] Cache mismatch detected. Stale tracking stub contains fewer frames than the active input video. Forcing full YOLO re-inference...")
 
         # Load court keypoints to define boundaries
-        court_keypoints_path = "tracker_stubs/court_keypoints.pkl"
         polygon = None
-        if os.path.exists(court_keypoints_path):
+        if court_keypoints_path and os.path.exists(court_keypoints_path):
             print(f"Loading court keypoints for boundary filtering: {court_keypoints_path}")
             with open(court_keypoints_path, 'rb') as f:
                 court_keypoints = pickle.load(f)

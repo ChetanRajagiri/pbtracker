@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 class BallPhysicsAnalyzer:
-    def __init__(self, pkl_path='tracker_stubs/ball_detections.pkl', window_size=2):
+    def __init__(self, pkl_path='tracker_stubs/ball_detections.pkl', window_size=3):
         self.pkl_path = pkl_path
         self.window_size = window_size
         self.df = None
@@ -72,18 +72,44 @@ class BallPhysicsAnalyzer:
         self.df['vel_magnitude'] = np.sqrt(self.df['vx']**2 + self.df['vy']**2)
         self.df['acc_magnitude'] = np.sqrt(self.df['ax']**2 + self.df['ay']**2)
         
-    def detect_events(self, bounce_height_threshold=1.5, hit_acc_threshold=2.8, cooldown_frames=5):
-        if 'vx' not in self.df.columns:
+    def detect_events(self, bounce_height_threshold=1.5, hit_acc_threshold=1.4, cooldown_frames=5):
+        if self.df is None or 'vx' not in self.df.columns:
             self.compute_kinematics()
             
         self.events = {}
         n = len(self.df)
         
+        # Determine frame height dynamically from video
+        frame_height = 1080  # default fallback
+        import cv2
+        import glob
+        
+        # Select appropriate video based on number of frames to support both newclip and newvideo
+        video_path = "input_videos/newclip.mp4"
+        if n > 5000:
+            video_path = "input_videos/newvideo.mp4"
+            
+        if not os.path.exists(video_path):
+            # Fallback scan for any video in input_videos
+            video_files = []
+            for ext in ["*.mp4", "*.avi", "*.mov", "*.mkv"]:
+                video_files.extend(glob.glob(os.path.join("input_videos", ext)))
+            if video_files:
+                video_path = video_files[0]
+                
+        if os.path.exists(video_path):
+            cap = cv2.VideoCapture(video_path)
+            frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            cap.release()
+            print(f"[PHYSICS] Dynamically loaded frame height from {video_path}: {frame_height} px")
+        else:
+            print(f"[WARNING] Video file not found. Defaulting to frame height: {frame_height} px")
+            
         # Keep track of bounce frames to suppress adjacent hit false positives
         bounce_frames = set()
         
-        # Step 1: Detect all Bounces first (Primary Priority)
-        # Bounces are highly distinct vertical velocity V-shaped inflections.
+        # Step 1: Detect all Bounces first (Primary Priority with Spatial Height Constraint)
+        # Bounces are highly distinct vertical velocity V-shaped inflections in the lower half of the screen.
         for t in range(2, n - 2):
             row = self.df.iloc[t]
             frame_idx = int(row['frame'])
@@ -96,8 +122,12 @@ class BallPhysicsAnalyzer:
             is_y_peak = (y_prev < y_curr) and (y_curr > y_next)
             
             if is_y_peak and self.df.iloc[t]['ay'] < -bounce_height_threshold:
-                # Store detected bounces
-                bounce_frames.add(frame_idx)
+                # 1. "Mid-Air" Bounce Filter: Bounce y_curr must be in the lower half of the video frame
+                if y_curr > frame_height * 0.5:
+                    bounce_frames.add(frame_idx)
+                else:
+                    # Trajectory inversion too high in the air; force to be evaluated as a potential HIT in Step 2.
+                    pass
         
         # Step 2: Resolve Events with Priority Hierarchy, Cooldown Lockouts, and Mutual Exclusivity
         cooldown_counter = 0
@@ -114,7 +144,7 @@ class BallPhysicsAnalyzer:
             # --- Priority 1: Court Floor Bounce ---
             if frame_idx in bounce_frames:
                 self.events[frame_idx] = "BOUNCE"
-                cooldown_counter = cooldown_frames # Start temporal lockout
+                cooldown_counter = cooldown_frames  # Start temporal lockout
                 continue
                 
             # --- Priority 2: Paddle Hit ---
@@ -131,15 +161,16 @@ class BallPhysicsAnalyzer:
             delta_vx = abs(vx_curr - vx_prev)
             delta_vy = abs(vy_curr - vy_prev)
             
-            # Sensitive direction sign change (minimum velocity checkpoint lowered to 0.1 to register kitchen dinks)
-            dir_change_x = (np.sign(vx_curr) != np.sign(vx_prev)) and (abs(vx_curr) > 0.1 and abs(vx_prev) > 0.1)
-            dir_change_y = (np.sign(vy_curr) != np.sign(vy_prev)) and (abs(vy_curr) > 0.1 and abs(vy_prev) > 0.1)
+            # Sensitive direction sign change (minimum velocity checkpoint lowered to 0.05 to capture soft dinks)
+            dir_change_x = (np.sign(vx_curr) != np.sign(vx_prev)) and (abs(vx_curr) > 0.05 and abs(vx_prev) > 0.05)
+            dir_change_y = (np.sign(vy_curr) != np.sign(vy_prev)) and (abs(vy_curr) > 0.05 and abs(vy_prev) > 0.05)
             
+            # Reversal acceleration thresholds lowered from 1.0 to 0.5 (50% reduction) to catch soft blocks
             if (delta_vx > hit_acc_threshold) or (delta_vy > hit_acc_threshold) or \
-               ((dir_change_x or dir_change_y) and (abs(row['ax']) > 1.0 or abs(row['ay']) > 1.0)):
+               ((dir_change_x or dir_change_y) and (abs(row['ax']) > 0.5 or abs(row['ay']) > 0.5)):
                 self.events[frame_idx] = "HIT"
-                cooldown_counter = cooldown_frames # Start temporal lockout
-
+                cooldown_counter = cooldown_frames  # Start temporal lockout
+ 
         return self.events
 
     def save_events(self, output_path='tracker_stubs/ball_events.pkl'):

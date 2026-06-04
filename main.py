@@ -2,29 +2,39 @@ import os
 import glob
 import cv2
 import pickle
+import argparse
 from trackers.player_tracker import PlayerTracker
 from trackers.ball_tracker import BallTracker
 from court_line_detector.manual_court_selector import ManualCourtDetector
 from court_line_detector.mini_court import MiniCourt
 from utils.stats_telemetry_tracker import StatsTelemetryTracker
 from utils.officiating_engine import OfficiatingEngine
+from utils.auto_player_filter import AutoPlayerFilter
+from utils.ball_physics_analyzer import BallPhysicsAnalyzer
 
 def main():
-    # Find sample video
-    input_dir = "input_videos"
-    video_extensions = ["*.mp4", "*.avi", "*.mov", "*.mkv"]
-    video_files = []
-    for ext in video_extensions:
-        video_files.extend(glob.glob(os.path.join(input_dir, ext)))
-
-    if not video_files:
-        print(f"No videos found in '{input_dir}'. Please add a tennis video clip first.")
+    # Set up argument parsing for dynamic video input
+    parser = argparse.ArgumentParser(description="Dynamic Pickleball Tracking and Telemetry Pipeline")
+    parser.add_argument("--video", default="input_videos/newclip.mp4", help="Path to the input video file")
+    args = parser.parse_args()
+    
+    video_path = args.video
+    if not os.path.exists(video_path):
+        print(f"Error: Video file '{video_path}' does not exist.")
         return
+        
+    print(f"Processing video: {video_path}")
+    
+    # Generate base name for dynamic cache stub file naming
+    video_base = os.path.splitext(os.path.basename(video_path))[0]
+    
+    # Stub paths
+    player_stub_path = "tracker_stubs/player_detections.pkl"
+    ball_stub_path = "tracker_stubs/ball_detections.pkl"
+    court_stub_path = "tracker_stubs/court_keypoints.pkl"
+    ball_events_stub_path = "tracker_stubs/ball_events.pkl"
 
-    video_path = "input_videos/newclip.mp4"
-    print(f"Reading video: {video_path}")
-
-    # 1. Open Video Capture to get dimensions & FPS
+    # Open Video Capture to get dimensions & FPS
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -39,16 +49,10 @@ def main():
         print("Error: Could not read first frame of video.")
         return
 
-    # Initialize Trackers, Court Detector, and Mini Court Radar
+    # Initialize Trackers, Court Detector
     player_tracker = PlayerTracker(model_path='yolov8x.pt')
     ball_tracker = BallTracker(model_path='models/yolo5_last.pt')
     court_detector = ManualCourtDetector()
-
-    # Stub paths
-    player_stub_path = "tracker_stubs/player_detections.pkl"
-    ball_stub_path = "tracker_stubs/ball_detections.pkl"
-    court_stub_path = "tracker_stubs/court_keypoints.pkl"
-    ball_events_stub_path = "tracker_stubs/ball_events.pkl"
     
     # Get court keypoints first (so it exists for the tracking loop boundary filtering)
     court_keypoints = court_detector.get_keypoints(first_frame, stub_path=court_stub_path)
@@ -56,11 +60,20 @@ def main():
     # Initialize MiniCourt Radar
     mini_court = MiniCourt(court_keypoints_path=court_stub_path)
 
-    # Load or run player detections in memory-efficient stream loop if cache does not exist
+    # 1. Load or run player detections in memory-efficient stream loop
+    need_filtration = False
     if os.path.exists(player_stub_path):
         print(f"Loading player tracking data from stub: {player_stub_path}")
         with open(player_stub_path, 'rb') as f:
             player_detections = pickle.load(f)
+        
+        # Check if loaded data is raw (contains track IDs other than 1, 2, 3, 4)
+        unique_ids = set()
+        for frame_dict in player_detections:
+            unique_ids.update(frame_dict.keys())
+        if any(uid > 4 for uid in unique_ids):
+            print("[PIPELINE] Loaded player detections stub contains raw tracks. Forcing player filtration...")
+            need_filtration = True
     else:
         print("Player detections cache not found. Running tracking over video stream...")
         player_detections = []
@@ -71,7 +84,7 @@ def main():
             if not ret:
                 break
             # detect_frames on a single-frame list
-            detection_dict = player_tracker.detect_frames([frame], read_from_stub=False)[0]
+            detection_dict = player_tracker.detect_frames([frame], read_from_stub=False, court_keypoints_path=court_stub_path)[0]
             player_detections.append(detection_dict)
             frame_idx += 1
             if frame_idx % 100 == 0:
@@ -82,9 +95,16 @@ def main():
         os.makedirs(os.path.dirname(player_stub_path), exist_ok=True)
         with open(player_stub_path, 'wb') as f:
             pickle.dump(player_detections, f)
-        print(f"Successfully saved player tracking to stub: {player_stub_path}")
+        print(f"Successfully saved raw player tracking to stub: {player_stub_path}")
+        need_filtration = True
+        
+    if need_filtration:
+        # Run AutoPlayerFilter to clean the detections
+        print("Applying automatic player isolation and spectator purging...")
+        player_filter = AutoPlayerFilter(detections_pkl=player_stub_path, court_pkl=court_stub_path)
+        player_detections = player_filter.run_filtration()
 
-    # Load or run ball detections in memory-efficient stream loop if cache does not exist
+    # 2. Load or run ball detections in memory-efficient stream loop
     if os.path.exists(ball_stub_path):
         print(f"Loading ball tracking data from stub: {ball_stub_path}")
         with open(ball_stub_path, 'rb') as f:
@@ -115,14 +135,17 @@ def main():
     # Interpolate ball positions to resolve flickering
     ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
 
-    # Load ball events for telemetry processing (default to empty dict if not found)
-    ball_events = {}
+    # 3. Load or compute ball physics events
     if os.path.exists(ball_events_stub_path):
         print(f"Loading ball physics events from: {ball_events_stub_path}")
         with open(ball_events_stub_path, 'rb') as f:
             ball_events = pickle.load(f)
     else:
-        print("[WARNING] No ball events stub found. Skipping shot attribution. Run utils/ball_physics_analyzer.py first.")
+        print("Ball physics events cache not found. Running BallPhysicsAnalyzer...")
+        physics_analyzer = BallPhysicsAnalyzer(pkl_path=ball_stub_path)
+        physics_analyzer.detect_events()
+        physics_analyzer.save_events(output_path=ball_events_stub_path)
+        ball_events = physics_analyzer.events
 
     # Initialize and process Stats Telemetry
     telemetry_tracker = StatsTelemetryTracker(fps=fps, court_keypoints_path=court_stub_path)
