@@ -4,9 +4,10 @@ import pandas as pd
 import numpy as np
 
 class BallPhysicsAnalyzer:
-    def __init__(self, pkl_path='tracker_stubs/ball_detections.pkl', window_size=3):
+    def __init__(self, pkl_path='tracker_stubs/ball_detections.pkl', window_size=3, video_path=None):
         self.pkl_path = pkl_path
         self.window_size = window_size
+        self.video_path = video_path
         self.df = None
         self.events = {}
 
@@ -84,12 +85,10 @@ class BallPhysicsAnalyzer:
         import cv2
         import glob
         
-        # Select appropriate video based on number of frames to support both newclip and newvideo
-        video_path = "input_videos/newclip.mp4"
-        if n > 5000:
-            video_path = "input_videos/newvideo.mp4"
-            
-        if not os.path.exists(video_path):
+        # Use constructor video_path if specified
+        video_path = self.video_path
+        
+        if not video_path or not os.path.exists(video_path):
             # Fallback scan for any video in input_videos
             video_files = []
             for ext in ["*.mp4", "*.avi", "*.mov", "*.mkv"]:

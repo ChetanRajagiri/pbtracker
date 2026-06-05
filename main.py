@@ -101,7 +101,7 @@ def main():
     if need_filtration:
         # Run AutoPlayerFilter to clean the detections
         print("Applying automatic player isolation and spectator purging...")
-        player_filter = AutoPlayerFilter(detections_pkl=player_stub_path, court_pkl=court_stub_path)
+        player_filter = AutoPlayerFilter(detections_pkl=player_stub_path, court_pkl=court_stub_path, video_path=video_path)
         player_detections = player_filter.run_filtration()
 
     # 2. Load or run ball detections in memory-efficient stream loop
@@ -142,7 +142,7 @@ def main():
             ball_events = pickle.load(f)
     else:
         print("Ball physics events cache not found. Running BallPhysicsAnalyzer...")
-        physics_analyzer = BallPhysicsAnalyzer(pkl_path=ball_stub_path)
+        physics_analyzer = BallPhysicsAnalyzer(pkl_path=ball_stub_path, video_path=video_path)
         physics_analyzer.detect_events()
         physics_analyzer.save_events(output_path=ball_events_stub_path)
         ball_events = physics_analyzer.events
