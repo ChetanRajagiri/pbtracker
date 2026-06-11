@@ -174,6 +174,21 @@ uv run python utils/deep_reid_healer.py --drop 8 15 56
 uv run python utils/deep_reid_healer.py --threshold 0.90 --profile-frames 200
 ```
 
+
+## 📊 Analytics Dashboard
+
+InBound Vision includes an interactive post-match performance dashboard built with **Streamlit** and **Plotly**. The dashboard reads the cached player tracking, ball positions, and physics events to display:
+- **Interactive Heatmaps** of player movement mapped to a 2D court model.
+- **Match Dynamics** (total rallies, average shots per rally, game summary).
+- **Locomotion Metrics** (total distance covered, average and maximum sprint speed per player).
+- **Biomechanical Stats** (forehand vs. backhand distribution, unforced net/out faults, and DUPR rating).
+
+To run the dashboard:
+
+```bash
+uv run streamlit run app.py
+```
+
 ---
 
 ## 🔄 Recommended Workflow
