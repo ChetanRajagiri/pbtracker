@@ -1,0 +1,21 @@
+{
+  "projectRoot": "/Users/chetanrajagiri/Desktop/pbtracker",
+  "batchFiles": [
+    {"path": "app.py", "language": "python", "sizeLines": 592, "fileCategory": "code"},
+    {"path": "court_line_detector/mini_court.py", "language": "python", "sizeLines": 208, "fileCategory": "code"},
+    {"path": "utils/officiating_engine.py", "language": "python", "sizeLines": 118, "fileCategory": "code"},
+    {"path": "utils/stats_telemetry_tracker.py", "language": "python", "sizeLines": 170, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "app.py": [
+      "court_line_detector/mini_court.py"
+    ],
+    "court_line_detector/mini_court.py": [],
+    "utils/officiating_engine.py": [
+      "court_line_detector/mini_court.py"
+    ],
+    "utils/stats_telemetry_tracker.py": [
+      "court_line_detector/mini_court.py"
+    ]
+  }
+}

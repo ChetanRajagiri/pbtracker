@@ -56,7 +56,7 @@ pbtracker/
 
 ```bash
 # Clone the repo
-git clone <repo-url>
+git clone https://github.com/ChetanRajagiri/pbtracker
 cd pbtracker
 
 # Install dependencies

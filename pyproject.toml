@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "boxmot>=21.0.0",
-    "graphifyy>=0.8.28",
     "lapx>=0.9.4",
     "matplotlib>=3.10.9",
     "opencv-python>=4.13.0.92",

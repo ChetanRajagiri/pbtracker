@@ -1,0 +1,523 @@
+{
+  "nodes": [
+    {
+      "id": "file:utils/check_ids.py",
+      "type": "file",
+      "name": "check_ids.py",
+      "filePath": "utils/check_ids.py",
+      "summary": "Analyzes the player detection tracking stub file to generate and print a usage summary sorted by frame presence.",
+      "tags": ["utility", "script", "statistics", "track-id"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:utils/generate_id_debug_frame.py",
+      "type": "file",
+      "name": "generate_id_debug_frame.py",
+      "filePath": "utils/generate_id_debug_frame.py",
+      "summary": "Generates a single annotated diagnostic image from a source video highlighting detected players and their associated tracking IDs.",
+      "tags": ["utility", "visualization", "debugging", "opencv"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/generate_id_debug_frame.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "utils/generate_id_debug_frame.py",
+      "lineRange": [7, 101],
+      "summary": "Main execution logic that parses CLI arguments, loads tracking data, seeks to a populated frame, annotates it with bounding boxes/IDs, and saves it.",
+      "tags": ["entry-point", "cli", "annotation", "image-processing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:utils/tracklet_merger.py",
+      "type": "file",
+      "name": "tracklet_merger.py",
+      "filePath": "utils/tracklet_merger.py",
+      "summary": "Post-processing script to heal broken or fragmented tracklets by correlating them using temporal, spatial, and HSV color similarity.",
+      "tags": ["utility", "post-processing", "tracklet-merging", "histogram-correlation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:crop_player",
+      "type": "function",
+      "name": "crop_player",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [48, 57],
+      "summary": "Extracts and clamps a bounding-box region of interest representing a player from a video frame.",
+      "tags": ["utility", "image-processing", "cropping"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:build_tracklet_segments",
+      "type": "function",
+      "name": "build_tracklet_segments",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [72, 101],
+      "summary": "Parses detection frames to build lifespan metadata (start, end, first/last bbox) for each unique track ID.",
+      "tags": ["utility", "data-parsing", "tracklet-metadata"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:find_merge_candidates",
+      "type": "function",
+      "name": "find_merge_candidates",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [104, 135],
+      "summary": "Identifies pairs of candidate tracklets that satisfy temporal window and spatial centroid distance limits.",
+      "tags": ["utility", "filtering", "candidate-selection"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:score_visual_similarity",
+      "type": "function",
+      "name": "score_visual_similarity",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [141, 180],
+      "summary": "Extracts crops from the video frames for candidate tracklets and computes their HSV color histogram correlation score.",
+      "tags": ["utility", "visual-comparison", "histogram-correlation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:apply_remap",
+      "type": "function",
+      "name": "apply_remap",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [186, 203],
+      "summary": "Applies a track ID remap dictionary to the player detection timeline, handling any frame collisions.",
+      "tags": ["utility", "data-mapping", "remapping"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:run_merger",
+      "type": "function",
+      "name": "run_merger",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [209, 270],
+      "summary": "Orchestrates the post-processing merge workflow: loads stubs, filters candidates, scores visual similarity, applies remaps, and saves output.",
+      "tags": ["orchestration", "pipeline", "tracklet-merging"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/tracklet_merger.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "utils/tracklet_merger.py",
+      "lineRange": [276, 310],
+      "summary": "Parses command-line arguments and invokes the run_merger pipeline.",
+      "tags": ["entry-point", "cli", "orchestration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:utils/deep_reid_healer.py",
+      "type": "file",
+      "name": "deep_reid_healer.py",
+      "filePath": "utils/deep_reid_healer.py",
+      "summary": "Post-processing track stitcher that leverages a headless ResNet50 model to extract deep visual embeddings from player crops and stitches fragmented tracklets via cosine similarity.",
+      "tags": ["utility", "neural-network", "re-identification", "resnet50", "pytorch"],
+      "complexity": "complex",
+      "languageNotes": "Leverages PyTorch and torchvision's ResNet50 to compute 2048-dimensional normalized embeddings for visual comparison."
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:get_device",
+      "type": "function",
+      "name": "get_device",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [50, 61],
+      "summary": "Detects and returns the best available PyTorch compute device, preferring CUDA or Apple Metal (MPS) over CPU fallback.",
+      "tags": ["utility", "device-detection", "pytorch"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "type": "class",
+      "name": "DeepReIDExtractor",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [67, 120],
+      "summary": "Wraps a headless pretrained ResNet50 convolutional neural network to transform player image crops into high-dimensional visual embedding vectors.",
+      "tags": ["class", "deep-learning", "feature-extraction", "resnet50"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:DeepReIDExtractor.__init__",
+      "type": "function",
+      "name": "__init__",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [70, 92],
+      "summary": "Initializes the DeepReIDExtractor class, setting up the torchvision normalization transforms and loading the headless ResNet50 backbone.",
+      "tags": ["initializer", "model-loading", "preprocessing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:DeepReIDExtractor.extract",
+      "type": "function",
+      "name": "extract",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [95, 120],
+      "summary": "Extracts an L2-normalized 2048-dimensional feature embedding vector from an input BGR crop image.",
+      "tags": ["method", "feature-extraction", "inference"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:safe_crop",
+      "type": "function",
+      "name": "safe_crop",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [125, 134],
+      "summary": "Clamps a bounding box to frame dimensions and extracts the crop from the video frame.",
+      "tags": ["utility", "image-processing", "cropping"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:segment_tracks",
+      "type": "function",
+      "name": "segment_tracks",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [140, 167],
+      "summary": "Builds a dictionary containing metadata, bounding boxes, and frame indices for each unique track ID.",
+      "tags": ["utility", "data-parsing", "tracklet-metadata"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:build_baseline_profiles",
+      "type": "function",
+      "name": "build_baseline_profiles",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [173, 262],
+      "summary": "Extracts and averages embeddings from early frames to establish ground-truth baseline visual identity profiles for master tracks.",
+      "tags": ["utility", "profiling", "visual-identity", "feature-averaging"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:match_fragments",
+      "type": "function",
+      "name": "match_fragments",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [268, 371],
+      "summary": "Identifies late-appearing fragment tracklets and scores them against baseline profiles using cosine similarity to find re-ID matches.",
+      "tags": ["utility", "matching", "similarity-scoring", "re-identification"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:apply_remap_and_drop",
+      "type": "function",
+      "name": "apply_remap_and_drop",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [377, 405],
+      "summary": "Applies identity remapping to fragments and filters out designated noise track IDs across all detection frames.",
+      "tags": ["utility", "data-mapping", "filtering"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:print_track_summary",
+      "type": "function",
+      "name": "print_track_summary",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [411, 422],
+      "summary": "Prints a formatted log table summarizing all track IDs, their frame spans, and detection frame counts.",
+      "tags": ["utility", "logging", "diagnostics"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:run_healer",
+      "type": "function",
+      "name": "run_healer",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [427, 504],
+      "summary": "Runs the complete Re-ID healing pipeline from loading pickle data, extracting baseline and fragment embeddings, remapping, and saving.",
+      "tags": ["orchestration", "pipeline", "deep-learning"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/deep_reid_healer.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "utils/deep_reid_healer.py",
+      "lineRange": [509, 574],
+      "summary": "Parses CLI options and invokes the run_healer pipeline with the selected configuration.",
+      "tags": ["entry-point", "cli", "orchestration"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:utils/generate_id_debug_frame.py",
+      "target": "function:utils/generate_id_debug_frame.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/generate_id_debug_frame.py",
+      "target": "function:utils/generate_id_debug_frame.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:crop_player",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:crop_player",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:build_tracklet_segments",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:build_tracklet_segments",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:find_merge_candidates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:find_merge_candidates",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:score_visual_similarity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:score_visual_similarity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:apply_remap",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:apply_remap",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:run_merger",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:run_merger",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/tracklet_merger.py",
+      "target": "function:utils/tracklet_merger.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:get_device",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:get_device",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "target": "function:utils/deep_reid_healer.py:DeepReIDExtractor.__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "target": "function:utils/deep_reid_healer.py:DeepReIDExtractor.__init__",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "target": "function:utils/deep_reid_healer.py:DeepReIDExtractor.extract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "target": "function:utils/deep_reid_healer.py:DeepReIDExtractor.extract",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:safe_crop",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:safe_crop",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:segment_tracks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:segment_tracks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:build_baseline_profiles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:build_baseline_profiles",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:match_fragments",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:match_fragments",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:apply_remap_and_drop",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:apply_remap_and_drop",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:print_track_summary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:print_track_summary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:run_healer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:run_healer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/deep_reid_healer.py",
+      "target": "function:utils/deep_reid_healer.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

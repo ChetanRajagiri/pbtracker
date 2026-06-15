@@ -1,0 +1,1747 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "27ec0c959adc1dfa83ce8ff0278adeb0905216e5",
+  "generatedAt": "2026-06-15T11:35:56.834Z",
+  "files": {
+    ".python-version": {
+      "filePath": ".python-version",
+      "contentHash": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "2d9fadbf8ce10d125682002ce6d6e416bf3bbb556a717816469bc25a29dac9bf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": false
+    },
+    ".understand-anything/config.json": {
+      "filePath": ".understand-anything/config.json",
+      "contentHash": "08d37f20ea0af2233ae24f094723759f952381ecb6dd7f2aaa05ef96e95eae6b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4,
+      "hasStructuralAnalysis": true
+    },
+    "app.py": {
+      "filePath": "app.py",
+      "contentHash": "24820d003e13d44564dbde4c90e17f106f6e50d9d28700a7e4815da771e59a46",
+      "functions": [
+        {
+          "name": "get_video_metadata",
+          "params": [],
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "draw_stub_status",
+          "params": [
+            "name",
+            "path"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "load_datasets",
+          "params": [
+            "player_path",
+            "ball_path",
+            "court_path",
+            "events_path",
+            "fps_val"
+          ],
+          "exported": true,
+          "lineCount": 139
+        },
+        {
+          "name": "load_rally_log",
+          "params": [
+            "events_path",
+            "fps_val"
+          ],
+          "exported": true,
+          "lineCount": 51
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "streamlit",
+          "specifiers": [
+            "st"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "random",
+          "specifiers": [
+            "random"
+          ]
+        },
+        {
+          "source": "plotly.graph_objects",
+          "specifiers": [
+            "go"
+          ]
+        },
+        {
+          "source": "court_line_detector.mini_court",
+          "specifiers": [
+            "MiniCourt"
+          ]
+        }
+      ],
+      "exports": [
+        "get_video_metadata",
+        "draw_stub_status",
+        "load_datasets",
+        "load_rally_log"
+      ],
+      "totalLines": 593,
+      "hasStructuralAnalysis": true
+    },
+    "court_line_detector/__init__.py": {
+      "filePath": "court_line_detector/__init__.py",
+      "contentHash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "court_line_detector/manual_court_selector.py": {
+      "filePath": "court_line_detector/manual_court_selector.py",
+      "contentHash": "a9e2b54cd6e2c1e145edcda5dcf1ead40d800a5651d250396221c8c7c241aad3",
+      "functions": [],
+      "classes": [
+        {
+          "name": "ManualCourtDetector",
+          "methods": [
+            "__init__",
+            "get_keypoints",
+            "draw_keypoints_on_video"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 70
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        }
+      ],
+      "exports": [
+        "ManualCourtDetector"
+      ],
+      "totalLines": 75,
+      "hasStructuralAnalysis": true
+    },
+    "court_line_detector/mini_court.py": {
+      "filePath": "court_line_detector/mini_court.py",
+      "contentHash": "1300d7ce8cb908de6f03da02ff8bf30c209ba7ddb071bbb4de989fb5535100a5",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MiniCourt",
+          "methods": [
+            "__init__",
+            "load_homography_matrix",
+            "ft_to_pixels",
+            "draw_mini_court_base",
+            "transform_point",
+            "draw_points_on_mini_court"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 203
+        }
+      ],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "MiniCourt"
+      ],
+      "totalLines": 209,
+      "hasStructuralAnalysis": true
+    },
+    "graphify.html": {
+      "filePath": "graphify.html",
+      "contentHash": "ce7338fe9872e30f32a0eabc57d2d01b23843b2162ace05ba71aa3e69e09baea",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 897,
+      "hasStructuralAnalysis": false
+    },
+    "main.py": {
+      "filePath": "main.py",
+      "contentHash": "3d2c47881a5df87ba7904c1bea1d4bcbd8158f030a1590c218eec30f0ea6d30a",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 218
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "glob",
+          "specifiers": [
+            "glob"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "trackers.player_tracker",
+          "specifiers": [
+            "PlayerTracker"
+          ]
+        },
+        {
+          "source": "trackers.ball_tracker",
+          "specifiers": [
+            "BallTracker"
+          ]
+        },
+        {
+          "source": "court_line_detector.manual_court_selector",
+          "specifiers": [
+            "ManualCourtDetector"
+          ]
+        },
+        {
+          "source": "court_line_detector.mini_court",
+          "specifiers": [
+            "MiniCourt"
+          ]
+        },
+        {
+          "source": "utils.stats_telemetry_tracker",
+          "specifiers": [
+            "StatsTelemetryTracker"
+          ]
+        },
+        {
+          "source": "utils.officiating_engine",
+          "specifiers": [
+            "OfficiatingEngine"
+          ]
+        },
+        {
+          "source": "utils.auto_player_filter",
+          "specifiers": [
+            "AutoPlayerFilter"
+          ]
+        },
+        {
+          "source": "utils.ball_physics_analyzer",
+          "specifiers": [
+            "BallPhysicsAnalyzer"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 236,
+      "hasStructuralAnalysis": true
+    },
+    "METHODS_AND_RETROSPECTIVE.md": {
+      "filePath": "METHODS_AND_RETROSPECTIVE.md",
+      "contentHash": "3c6c85a1fd1ad48ad844898027ab29df67ec6971e6a7661b727b4fb9a74cf277",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 78,
+      "hasStructuralAnalysis": true
+    },
+    "pyproject.toml": {
+      "filePath": "pyproject.toml",
+      "contentHash": "73ae2d551e18763f5d5faa8587a9a83867b9da7ae7a89dd7cf0310f30da864e4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "34f1056844cf5c886647ab122b95bfb3d096abfed04d99e33879bf46b878352b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 290,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/analyze_filtration.py": {
+      "filePath": "scratch/analyze_filtration.py",
+      "contentHash": "09ff6be39f85be7ad3e98de809fe45b573f3f71fb059af3dd58a589f3e55c8b4",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 82
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 90,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/analyze_std.py": {
+      "filePath": "scratch/analyze_std.py",
+      "contentHash": "d649bd586bca7f6a95cbf7bf95ff5d5981499f8a6894c1f1ead37aeff9a27fa0",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 27
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 34,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/analyze_stubs.py": {
+      "filePath": "scratch/analyze_stubs.py",
+      "contentHash": "4703858be50ed1a9db2b9782ae8731d6f3eb16d60571925de694820cfa9b461e",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 43
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 52,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/annotate_frames_debug.py": {
+      "filePath": "scratch/annotate_frames_debug.py",
+      "contentHash": "dae885f02d8feb3d2fd63e9ed5695671bedc244bc6f1f3a7910f02f78d26cd89",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 47
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/botsort_custom.yaml": {
+      "filePath": "scratch/botsort_custom.yaml",
+      "contentHash": "40880d2f79626bf0552ed5c8ed7cfcdc88f9e3d8ca99bccb661df396dbe930b1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/check_malaysia.py": {
+      "filePath": "scratch/check_malaysia.py",
+      "contentHash": "e27f47f7e545a5b71d5107de02b57f64de20bffdb41b4005f718f30a94f1836a",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 6,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/check_video_frames.py": {
+      "filePath": "scratch/check_video_frames.py",
+      "contentHash": "fb330aa70126a4168e71e2a335a399c91e8103901ddcb8e2d69e8c78f666f296",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/extract_all_raw_crops.py": {
+      "filePath": "scratch/extract_all_raw_crops.py",
+      "contentHash": "33e8375bed118ee11ddc2ebae5484f3436067e843371e7af09d551a4b2f3541b",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 54
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/extract_final_frames.py": {
+      "filePath": "scratch/extract_final_frames.py",
+      "contentHash": "f48ca2557312958d407a5372a246bd6f368a2d123a918f67b0a5a64d01c8a388",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/extract_fine_tuned_frames.py": {
+      "filePath": "scratch/extract_fine_tuned_frames.py",
+      "contentHash": "8eb57126318af8b6e790028368b00bd8039eef058526dff53059bcbbe82a01ce",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/extract_malaysia_frames.py": {
+      "filePath": "scratch/extract_malaysia_frames.py",
+      "contentHash": "434c49fcf061d00e99372994b0c89f8be4135cf15d641f23a73851d4034d4256",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/extract_newvideo_frames.py": {
+      "filePath": "scratch/extract_newvideo_frames.py",
+      "contentHash": "c51b75a2ff002c7916e4fc943eb218fda396f1f8b2c0fcdee4ecf1783d859ee2",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 25
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/extract_player_crops.py": {
+      "filePath": "scratch/extract_player_crops.py",
+      "contentHash": "de09b5b66335d08a0f93501c305b4f0ccf08d19c51428dab4cc70f2181d0248b",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 52
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 60,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/generate_raw_tracks.py": {
+      "filePath": "scratch/generate_raw_tracks.py",
+      "contentHash": "6863d95fd720b556c58239016ca1476949694e35ea441d58c1aa980e10f85b10",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 49
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "trackers.player_tracker",
+          "specifiers": [
+            "PlayerTracker"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 58,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/inspect_malaysia_players.py": {
+      "filePath": "scratch/inspect_malaysia_players.py",
+      "contentHash": "00b65d6b5531701aa0da56780f8a69ab154d812fc82b59afb10c76ae679f5b45",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 21
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 28,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/prepare_newvideo_stubs.py": {
+      "filePath": "scratch/prepare_newvideo_stubs.py",
+      "contentHash": "d4c95643d0f6c1f3645211cc9f2109f861d48c20497329114f06c57140b41c45",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "shutil",
+          "specifiers": [
+            "shutil"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 31,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/print_frame_0.py": {
+      "filePath": "scratch/print_frame_0.py",
+      "contentHash": "c737a7f5349ecac7f5eac39f34ae568da24850a077c8a39c0ed15087848d38bd",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 9,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/rename_stubs.py": {
+      "filePath": "scratch/rename_stubs.py",
+      "contentHash": "0279cef99f783a29c300cb3b8fd28e87122751944168c65c081edb3d69672fa4",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "shutil",
+          "specifiers": [
+            "shutil"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "trackers/__init__.py": {
+      "filePath": "trackers/__init__.py",
+      "contentHash": "4bdfba49b01075bc25091bf1683d11955c82a7d9e3a62e9b12d9c7d5f5fad413",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "trackers/ball_tracker.py": {
+      "filePath": "trackers/ball_tracker.py",
+      "contentHash": "781005ba5367aea44c1673d71c9ca3c7a7ed28d3e71a6c1da0b506f313c06e14",
+      "functions": [],
+      "classes": [
+        {
+          "name": "BallTracker",
+          "methods": [
+            "__init__",
+            "interpolate_ball_positions",
+            "detect_frames",
+            "draw_bboxes"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 138
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "ultralytics",
+          "specifiers": [
+            "YOLO"
+          ]
+        }
+      ],
+      "exports": [
+        "BallTracker"
+      ],
+      "totalLines": 145,
+      "hasStructuralAnalysis": true
+    },
+    "trackers/player_tracker.py": {
+      "filePath": "trackers/player_tracker.py",
+      "contentHash": "c86dcbdae91a7738a574bbc95c6131f1312464a41a9d1038113880202717eb5c",
+      "functions": [
+        {
+          "name": "expand_polygon_asymmetric",
+          "params": [
+            "polygon",
+            "frame_height"
+          ],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [
+        {
+          "name": "PlayerTracker",
+          "methods": [
+            "__init__",
+            "detect_frames",
+            "draw_bboxes"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 170
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "torch",
+          "specifiers": [
+            "torch"
+          ]
+        },
+        {
+          "source": "ultralytics",
+          "specifiers": [
+            "YOLO"
+          ]
+        },
+        {
+          "source": "boxmot.trackers.tracker_zoo",
+          "specifiers": [
+            "create_tracker"
+          ]
+        }
+      ],
+      "exports": [
+        "expand_polygon_asymmetric",
+        "PlayerTracker"
+      ],
+      "totalLines": 204,
+      "hasStructuralAnalysis": true
+    },
+    "utils/__init__.py": {
+      "filePath": "utils/__init__.py",
+      "contentHash": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "utils/auto_player_filter.py": {
+      "filePath": "utils/auto_player_filter.py",
+      "contentHash": "d15924454185edd80fbee407d57e5a07245eb199545e7c28d4000311bfd301ea",
+      "functions": [
+        {
+          "name": "expand_polygon_asymmetric",
+          "params": [
+            "polygon",
+            "frame_height"
+          ],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [
+        {
+          "name": "AutoPlayerFilter",
+          "methods": [
+            "__init__",
+            "load_data",
+            "run_filtration"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 304
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        }
+      ],
+      "exports": [
+        "expand_polygon_asymmetric",
+        "AutoPlayerFilter"
+      ],
+      "totalLines": 349,
+      "hasStructuralAnalysis": true
+    },
+    "utils/ball_physics_analyzer.py": {
+      "filePath": "utils/ball_physics_analyzer.py",
+      "contentHash": "fc9eee37b875d499af296d16d562895db9faa9ff20e9a84eb75ca2afe9535360",
+      "functions": [],
+      "classes": [
+        {
+          "name": "BallPhysicsAnalyzer",
+          "methods": [
+            "__init__",
+            "load_and_preprocess",
+            "compute_kinematics",
+            "detect_events",
+            "save_events",
+            "print_summary"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 187
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        }
+      ],
+      "exports": [
+        "BallPhysicsAnalyzer"
+      ],
+      "totalLines": 201,
+      "hasStructuralAnalysis": true
+    },
+    "utils/check_ids.py": {
+      "filePath": "utils/check_ids.py",
+      "contentHash": "758e8ccae16403faa19e10d982677148ccb89bfb4db0393c33bf8f84710306ea",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 15,
+      "hasStructuralAnalysis": true
+    },
+    "utils/deep_reid_healer.py": {
+      "filePath": "utils/deep_reid_healer.py",
+      "contentHash": "30e60c2bb838dec8290fc8dcba05f7a50d4704ea345a5d2b4ca2a6644bbbb5e8",
+      "functions": [
+        {
+          "name": "get_device",
+          "params": [],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "safe_crop",
+          "params": [
+            "frame",
+            "bbox"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "segment_tracks",
+          "params": [
+            "player_detections"
+          ],
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "build_baseline_profiles",
+          "params": [
+            "extractor",
+            "video_path",
+            "player_detections",
+            "segments",
+            "profile_frame_window",
+            "profile_crop_count",
+            "fragment_min_frame"
+          ],
+          "exported": true,
+          "lineCount": 90
+        },
+        {
+          "name": "match_fragments",
+          "params": [
+            "extractor",
+            "video_path",
+            "segments",
+            "profiles",
+            "fragment_min_frame",
+            "fragment_sample_count",
+            "cosine_threshold"
+          ],
+          "exported": true,
+          "lineCount": 104
+        },
+        {
+          "name": "apply_remap_and_drop",
+          "params": [
+            "player_detections",
+            "remap",
+            "drop_ids"
+          ],
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "print_track_summary",
+          "params": [
+            "label",
+            "player_detections"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "run_healer",
+          "params": [
+            "video_path",
+            "pkl_path",
+            "cosine_threshold",
+            "profile_frame_window",
+            "profile_crop_count",
+            "fragment_min_frame",
+            "fragment_sample_count",
+            "drop_ids",
+            "drop_noise",
+            "keep_ids"
+          ],
+          "exported": true,
+          "lineCount": 77
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 65
+        }
+      ],
+      "classes": [
+        {
+          "name": "DeepReIDExtractor",
+          "methods": [
+            "__init__",
+            "extract"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 53
+        }
+      ],
+      "imports": [
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "random",
+          "specifiers": [
+            "random"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "collections",
+          "specifiers": [
+            "defaultdict"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "torch",
+          "specifiers": [
+            "torch"
+          ]
+        },
+        {
+          "source": "torch.nn",
+          "specifiers": [
+            "nn"
+          ]
+        },
+        {
+          "source": "torchvision.models",
+          "specifiers": [
+            "models"
+          ]
+        },
+        {
+          "source": "torchvision.transforms",
+          "specifiers": [
+            "T"
+          ]
+        },
+        {
+          "source": "torchvision.models",
+          "specifiers": [
+            "ResNet50_Weights"
+          ]
+        },
+        {
+          "source": "tqdm",
+          "specifiers": [
+            "tqdm"
+          ]
+        }
+      ],
+      "exports": [
+        "get_device",
+        "DeepReIDExtractor",
+        "safe_crop",
+        "segment_tracks",
+        "build_baseline_profiles",
+        "match_fragments",
+        "apply_remap_and_drop",
+        "print_track_summary",
+        "run_healer",
+        "main"
+      ],
+      "totalLines": 578,
+      "hasStructuralAnalysis": true
+    },
+    "utils/generate_id_debug_frame.py": {
+      "filePath": "utils/generate_id_debug_frame.py",
+      "contentHash": "d6c94375704475b1f2cb7f89105f85c2c4a2e06ecb4baaf2b6efd6c86a8d768f",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 94
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "glob",
+          "specifiers": [
+            "glob"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 104,
+      "hasStructuralAnalysis": true
+    },
+    "utils/officiating_engine.py": {
+      "filePath": "utils/officiating_engine.py",
+      "contentHash": "9ba03c6fc11ae8fd46ac79f27b0ba7d8e08c95a909a2f5b357c9e693b65b380d",
+      "functions": [],
+      "classes": [
+        {
+          "name": "OfficiatingEngine",
+          "methods": [
+            "__init__",
+            "get_line_calls",
+            "draw_calls_on_video"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 113
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "court_line_detector.mini_court",
+          "specifiers": [
+            "MiniCourt"
+          ]
+        }
+      ],
+      "exports": [
+        "OfficiatingEngine"
+      ],
+      "totalLines": 119,
+      "hasStructuralAnalysis": true
+    },
+    "utils/stats_telemetry_tracker.py": {
+      "filePath": "utils/stats_telemetry_tracker.py",
+      "contentHash": "61152c7ba5685e9f5a6c5dc203e92150b6b38d877cc4627df0ce5ec128bb3302",
+      "functions": [],
+      "classes": [
+        {
+          "name": "StatsTelemetryTracker",
+          "methods": [
+            "__init__",
+            "process_match_telemetry",
+            "draw_stats_hud"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 164
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "court_line_detector.mini_court",
+          "specifiers": [
+            "MiniCourt"
+          ]
+        }
+      ],
+      "exports": [
+        "StatsTelemetryTracker"
+      ],
+      "totalLines": 171,
+      "hasStructuralAnalysis": true
+    },
+    "utils/tracklet_merger.py": {
+      "filePath": "utils/tracklet_merger.py",
+      "contentHash": "853fcf0584f376aa2c22d971bfeb578b4b98740a1a946c0aed943531d086925c",
+      "functions": [
+        {
+          "name": "bbox_centroid",
+          "params": [
+            "bbox"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "euclidean",
+          "params": [
+            "a",
+            "b"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "crop_player",
+          "params": [
+            "frame",
+            "bbox"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "hsv_histogram",
+          "params": [
+            "crop"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "build_tracklet_segments",
+          "params": [
+            "player_detections"
+          ],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "find_merge_candidates",
+          "params": [
+            "segments",
+            "temporal_window",
+            "spatial_threshold"
+          ],
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "score_visual_similarity",
+          "params": [
+            "video_path",
+            "segments",
+            "old_id",
+            "new_id"
+          ],
+          "exported": true,
+          "lineCount": 40
+        },
+        {
+          "name": "apply_remap",
+          "params": [
+            "player_detections",
+            "remap"
+          ],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "run_merger",
+          "params": [
+            "video_path",
+            "pkl_path",
+            "temporal_window",
+            "spatial_threshold",
+            "hist_threshold"
+          ],
+          "exported": true,
+          "lineCount": 62
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 34
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "cv2",
+          "specifiers": [
+            "cv2"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        }
+      ],
+      "exports": [
+        "bbox_centroid",
+        "euclidean",
+        "crop_player",
+        "hsv_histogram",
+        "build_tracklet_segments",
+        "find_merge_candidates",
+        "score_visual_similarity",
+        "apply_remap",
+        "run_merger",
+        "main"
+      ],
+      "totalLines": 314,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

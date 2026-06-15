@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/Users/chetanrajagiri/Desktop/pbtracker",
+  "batchFiles": [
+    {"path": "METHODS_AND_RETROSPECTIVE.md", "language": "markdown", "sizeLines": 77, "fileCategory": "docs"},
+    {"path": "README.md", "language": "markdown", "sizeLines": 289, "fileCategory": "docs"},
+    {"path": "graphify.html", "language": "html", "sizeLines": 896, "fileCategory": "markup"},
+    {"path": "pyproject.toml", "language": "toml", "sizeLines": 20, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "METHODS_AND_RETROSPECTIVE.md": [],
+    "README.md": [],
+    "graphify.html": [],
+    "pyproject.toml": []
+  }
+}

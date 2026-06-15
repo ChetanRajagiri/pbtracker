@@ -1,0 +1,26 @@
+{
+  "projectRoot": "/Users/chetanrajagiri/Desktop/pbtracker",
+  "batchFiles": [
+    {"path": "court_line_detector/manual_court_selector.py", "language": "python", "sizeLines": 74, "fileCategory": "code"},
+    {"path": "main.py", "language": "python", "sizeLines": 235, "fileCategory": "code"},
+    {"path": "trackers/ball_tracker.py", "language": "python", "sizeLines": 144, "fileCategory": "code"},
+    {"path": "utils/auto_player_filter.py", "language": "python", "sizeLines": 348, "fileCategory": "code"},
+    {"path": "utils/ball_physics_analyzer.py", "language": "python", "sizeLines": 200, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "court_line_detector/manual_court_selector.py": [],
+    "main.py": [
+      "court_line_detector/manual_court_selector.py",
+      "court_line_detector/mini_court.py",
+      "trackers/ball_tracker.py",
+      "trackers/player_tracker.py",
+      "utils/auto_player_filter.py",
+      "utils/ball_physics_analyzer.py",
+      "utils/officiating_engine.py",
+      "utils/stats_telemetry_tracker.py"
+    ],
+    "trackers/ball_tracker.py": [],
+    "utils/auto_player_filter.py": [],
+    "utils/ball_physics_analyzer.py": []
+  }
+}

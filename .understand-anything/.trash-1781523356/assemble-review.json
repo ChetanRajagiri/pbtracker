@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-06-15T16:50:22+05:30",
+  "review": {
+    "status": "PASS",
+    "summary": "Assembled graph validated successfully. Verified 112 nodes and 159 original edges, identified and restored 6 missing cross-batch call edges.",
+    "batchFilesAudited": [
+      "batch-1.json",
+      "batch-2.json",
+      "batch-3.json",
+      "batch-4.json",
+      "batch-5.json"
+    ],
+    "nodes": {
+      "totalNodes": 112,
+      "unknownTypes": 0,
+      "unknownComplexities": 0,
+      "droppedNodes": 0
+    },
+    "edges": {
+      "originalEdges": 159,
+      "droppedEdgesFromBatches": 0,
+      "restoredCrossBatchCallEdges": 6,
+      "totalEdges": 165
+    },
+    "edgeRecovery": {
+      "importMapStatus": "All importMap edges were already successfully present in batch files; 0 recovered by script, verified correct."
+    },
+    "gapsAndFixes": [
+      {
+        "issueType": "Cross-Batch Call Edge Gap",
+        "description": "Call from main.py:main to trackers/player_tracker.py:PlayerTracker.detect_frames was missing because player_tracker.py is in batch-4 while main.py is in batch-1.",
+        "action": "Restored in assembled-graph.json"
+      },
+      {
+        "issueType": "Cross-Batch Call Edge Gap",
+        "description": "Call from main.py:main to trackers/player_tracker.py:PlayerTracker.draw_bboxes was missing because player_tracker.py is in batch-4 while main.py is in batch-1.",
+        "action": "Restored in assembled-graph.json"
+      },
+      {
+        "issueType": "Cross-Batch Call Edge Gap",
+        "description": "Call from main.py:main to court_line_detector/mini_court.py:MiniCourt:draw_points_on_mini_court was missing because mini_court.py is in batch-2 while main.py is in batch-1.",
+        "action": "Restored in assembled-graph.json"
+      },
+      {
+        "issueType": "Cross-Batch Call Edge Gap",
+        "description": "Call from main.py:main to utils/officiating_engine.py:OfficiatingEngine:get_line_calls was missing because officiating_engine.py is in batch-2 while main.py is in batch-1.",
+        "action": "Restored in assembled-graph.json"
+      },
+      {
+        "issueType": "Cross-Batch Call Edge Gap",
+        "description": "Call from main.py:main to utils/stats_telemetry_tracker.py:StatsTelemetryTracker:process_match_telemetry was missing because stats_telemetry_tracker.py is in batch-2 while main.py is in batch-1.",
+        "action": "Restored in assembled-graph.json"
+      },
+      {
+        "issueType": "Cross-Batch Call Edge Gap",
+        "description": "Call from main.py:main to utils/stats_telemetry_tracker.py:StatsTelemetryTracker:draw_stats_hud was missing because stats_telemetry_tracker.py is in batch-2 while main.py is in batch-1.",
+        "action": "Restored in assembled-graph.json"
+      }
+    ]
+  }
+}

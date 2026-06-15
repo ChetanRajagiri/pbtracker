@@ -1,0 +1,215 @@
+{
+  "projectRoot": "/Users/chetanrajagiri/Desktop/pbtracker",
+  "files": [
+    {
+      "path": ".python-version",
+      "language": "unknown",
+      "fileCategory": "code"
+    },
+    {
+      "path": ".understand-anything/.understandignore",
+      "language": "unknown",
+      "fileCategory": "code"
+    },
+    {
+      "path": ".understand-anything/config.json",
+      "language": "json",
+      "fileCategory": "config"
+    },
+    {
+      "path": "app.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "court_line_detector/__init__.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "court_line_detector/manual_court_selector.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "court_line_detector/mini_court.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "graphify.html",
+      "language": "html",
+      "fileCategory": "markup"
+    },
+    {
+      "path": "main.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "METHODS_AND_RETROSPECTIVE.md",
+      "language": "markdown",
+      "fileCategory": "docs"
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "fileCategory": "config"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "fileCategory": "docs"
+    },
+    {
+      "path": "scratch/analyze_filtration.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/analyze_std.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/analyze_stubs.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/annotate_frames_debug.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/botsort_custom.yaml",
+      "language": "yaml",
+      "fileCategory": "config"
+    },
+    {
+      "path": "scratch/check_malaysia.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/check_video_frames.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/extract_all_raw_crops.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/extract_final_frames.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/extract_fine_tuned_frames.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/extract_malaysia_frames.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/extract_newvideo_frames.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/extract_player_crops.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/generate_raw_tracks.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/inspect_malaysia_players.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/prepare_newvideo_stubs.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/print_frame_0.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/rename_stubs.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "trackers/__init__.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "trackers/ball_tracker.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "trackers/player_tracker.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/__init__.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/auto_player_filter.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/ball_physics_analyzer.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/check_ids.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/deep_reid_healer.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/generate_id_debug_frame.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/officiating_engine.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/stats_telemetry_tracker.py",
+      "language": "python",
+      "fileCategory": "code"
+    },
+    {
+      "path": "utils/tracklet_merger.py",
+      "language": "python",
+      "fileCategory": "code"
+    }
+  ]
+}

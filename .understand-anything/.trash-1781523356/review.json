@@ -1,0 +1,37 @@
+{
+  "issues": [],
+  "warnings": [
+    "Node 'file:.python-version' has no edges (orphan)",
+    "Node 'file:.understand-anything/.understandignore' has no edges (orphan)",
+    "Node 'config:.understand-anything/config.json' has no edges (orphan)",
+    "Node 'file:court_line_detector/__init__.py' has no edges (orphan)",
+    "Node 'file:scratch/check_malaysia.py' has no edges (orphan)",
+    "Node 'file:scratch/check_video_frames.py' has no edges (orphan)",
+    "Node 'file:scratch/print_frame_0.py' has no edges (orphan)",
+    "Node 'file:trackers/__init__.py' has no edges (orphan)",
+    "Node 'file:utils/__init__.py' has no edges (orphan)",
+    "Node 'file:utils/check_ids.py' has no edges (orphan)"
+  ],
+  "stats": {
+    "totalNodes": 112,
+    "totalEdges": 165,
+    "totalLayers": 8,
+    "tourSteps": 14,
+    "nodeTypes": {
+      "file": 37,
+      "class": 9,
+      "function": 61,
+      "document": 2,
+      "config": 3
+    },
+    "edgeTypes": {
+      "imports": 12,
+      "contains": 70,
+      "exports": 31,
+      "calls": 35,
+      "configures": 2,
+      "documents": 12,
+      "related": 3
+    }
+  }
+}

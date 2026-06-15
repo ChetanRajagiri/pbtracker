@@ -1,0 +1,412 @@
+{
+  "nodes": [
+    {
+      "id": "file:app.py",
+      "type": "file",
+      "name": "app.py",
+      "filePath": "app.py",
+      "summary": "Main Streamlit application that renders the InBound Vision dashboard with match performance statistics, player scorecards, rally logs, and interactive 2D court telemetry plots.",
+      "tags": ["entry-point", "visualization", "streamlit", "dashboard"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app.py:get_video_metadata",
+      "type": "function",
+      "name": "get_video_metadata",
+      "filePath": "app.py",
+      "lineRange": [96, 114],
+      "summary": "Scans the input_videos directory and dynamically resolves the video dimensions, framerate, and total frames using OpenCV.",
+      "tags": ["utility", "video-processing", "metadata"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:app.py:load_datasets",
+      "type": "function",
+      "name": "load_datasets",
+      "filePath": "app.py",
+      "lineRange": [150, 288],
+      "summary": "Loads pickle stubs for tracking data and aggregates locomotion statistics, speed calculations, and proximity-based shot attribution for all players.",
+      "tags": ["data-loader", "telemetry", "metrics-aggregation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app.py:load_rally_log",
+      "type": "function",
+      "name": "load_rally_log",
+      "filePath": "app.py",
+      "lineRange": [294, 344],
+      "summary": "Segments match plays into discrete rallies using a temporal activity gap threshold and compiles shot and bounce analytics per rally.",
+      "tags": ["data-loader", "segmentation", "analytics"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:court_line_detector/mini_court.py",
+      "type": "file",
+      "name": "mini_court.py",
+      "filePath": "court_line_detector/mini_court.py",
+      "summary": "Defines the MiniCourt class, which uses homography transformation to project 2D camera coordinates onto a top-down, real-world representation of a Pickleball court.",
+      "tags": ["computer-vision", "homography", "court-mapping", "visualization"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:court_line_detector/mini_court.py:MiniCourt",
+      "type": "class",
+      "name": "MiniCourt",
+      "filePath": "court_line_detector/mini_court.py",
+      "lineRange": [6, 208],
+      "summary": "Top-down 2D mapping manager that computes homography matrices, transforms pixel coordinates to court-space feet, and draws players, ball, and officiating calls on a minimap canvas.",
+      "tags": ["mapping-manager", "coordinate-transform", "drawing-utility"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:court_line_detector/mini_court.py:MiniCourt:__init__",
+      "type": "function",
+      "name": "MiniCourt.__init__",
+      "filePath": "court_line_detector/mini_court.py",
+      "lineRange": [7, 26],
+      "summary": "Initializes the top-down canvas dimensions, official pickleball boundaries in feet, and triggers homography matrix loading.",
+      "tags": ["constructor", "initialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:court_line_detector/mini_court.py:MiniCourt:load_homography_matrix",
+      "type": "function",
+      "name": "MiniCourt.load_homography_matrix",
+      "filePath": "court_line_detector/mini_court.py",
+      "lineRange": [27, 64],
+      "summary": "Loads pre-defined court keypoints from a pickle file and computes the 3x3 homography matrix mapping image space to physical court dimensions.",
+      "tags": ["data-loader", "homography-calculation", "cv2"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:court_line_detector/mini_court.py:MiniCourt:draw_mini_court_base",
+      "type": "function",
+      "name": "MiniCourt.draw_mini_court_base",
+      "filePath": "court_line_detector/mini_court.py",
+      "lineRange": [76, 104],
+      "summary": "Renders the static boundaries of the pickleball court, including the kitchen line, center line, and net line, onto a dark background canvas.",
+      "tags": ["drawing-utility", "canvas-rendering"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+      "type": "function",
+      "name": "MiniCourt.transform_point",
+      "filePath": "court_line_detector/mini_court.py",
+      "lineRange": [106, 117],
+      "summary": "Applies perspective transformation to project 2D image coordinates to physical ground coordinates in feet.",
+      "tags": ["coordinate-transform", "computer-vision"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:court_line_detector/mini_court.py:MiniCourt:draw_points_on_mini_court",
+      "type": "function",
+      "name": "MiniCourt.draw_points_on_mini_court",
+      "filePath": "court_line_detector/mini_court.py",
+      "lineRange": [118, 208],
+      "summary": "Draws players, the ball (interpolated or detected), and recent bounce line calls (IN/OUT) onto the mini-court minimap canvas.",
+      "tags": ["visualization", "rendering", "tracking-overlay"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:utils/officiating_engine.py",
+      "type": "file",
+      "name": "officiating_engine.py",
+      "filePath": "utils/officiating_engine.py",
+      "summary": "Provides the OfficiatingEngine class, which detects when a ball bounce is IN or OUT and overlays a broadcast-style banner with the call onto the video frame.",
+      "tags": ["officiating", "rule-engine", "video-overlay", "broadcast-graphics"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:utils/officiating_engine.py:OfficiatingEngine",
+      "type": "class",
+      "name": "OfficiatingEngine",
+      "filePath": "utils/officiating_engine.py",
+      "lineRange": [6, 118],
+      "summary": "Officiating manager class that computes line calls for bounce events and handles visual overlays of officiating calls.",
+      "tags": ["analytics-engine", "rule-validation", "overlay-renderer"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/officiating_engine.py:OfficiatingEngine:get_line_calls",
+      "type": "function",
+      "name": "OfficiatingEngine.get_line_calls",
+      "filePath": "utils/officiating_engine.py",
+      "lineRange": [10, 49],
+      "summary": "Iterates over ball events to identify bounce frames, converts the bounce coordinates to physical court dimensions, and determines if the bounce was IN or OUT.",
+      "tags": ["bounds-checker", "coordinate-projection", "event-processing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/officiating_engine.py:OfficiatingEngine:draw_calls_on_video",
+      "type": "function",
+      "name": "OfficiatingEngine.draw_calls_on_video",
+      "filePath": "utils/officiating_engine.py",
+      "lineRange": [51, 118],
+      "summary": "Applies a translucent dark banner and large BGR text overlays (\"IN\" in green, \"OUT\" in red) onto video frames for bounce occurrences.",
+      "tags": ["broadcast-style", "rendering", "overlay"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:utils/stats_telemetry_tracker.py",
+      "type": "file",
+      "name": "stats_telemetry_tracker.py",
+      "filePath": "utils/stats_telemetry_tracker.py",
+      "summary": "Provides the StatsTelemetryTracker class, which records and computes locomotion telemetry (speed, distance) and proximity-based hit attribution for individual players, and draws a HUD overlay.",
+      "tags": ["statistics", "locomotion-analytics", "telemetry", "hud-overlay"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "type": "class",
+      "name": "StatsTelemetryTracker",
+      "filePath": "utils/stats_telemetry_tracker.py",
+      "lineRange": [7, 170],
+      "summary": "Performance metrics tracker class that aggregates match locomotion data, attributes hits to players, and maintains a historical snapshot of player metrics.",
+      "tags": ["analytics-engine", "data-accumulator", "overlay-renderer"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:__init__",
+      "type": "function",
+      "name": "StatsTelemetryTracker.__init__",
+      "filePath": "utils/stats_telemetry_tracker.py",
+      "lineRange": [8, 19],
+      "summary": "Initializes telemetry tracker settings, instantiates a MiniCourt module, and seeds empty stat structures for players 1 to 4.",
+      "tags": ["constructor", "initialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:process_match_telemetry",
+      "type": "function",
+      "name": "StatsTelemetryTracker.process_match_telemetry",
+      "filePath": "utils/stats_telemetry_tracker.py",
+      "lineRange": [21, 113],
+      "summary": "Processes tracking coordinates frame-by-frame to compute distances and instantaneous speed, and detects player hits using ball-proximity measurements.",
+      "tags": ["data-processor", "speed-calculator", "shot-attribution"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:draw_stats_hud",
+      "type": "function",
+      "name": "StatsTelemetryTracker.draw_stats_hud",
+      "filePath": "utils/stats_telemetry_tracker.py",
+      "lineRange": [115, 170],
+      "summary": "Draws a premium semi-transparent overlay HUD with colored indicators displaying individual player performance stats on the video frames.",
+      "tags": ["hud-overlay", "rendering", "visualization"],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:get_video_metadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:load_datasets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:load_rally_log",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app.py",
+      "target": "file:court_line_detector/mini_court.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:app.py:load_datasets",
+      "target": "class:court_line_detector/mini_court.py:MiniCourt",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app.py:load_datasets",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:court_line_detector/mini_court.py",
+      "target": "class:court_line_detector/mini_court.py:MiniCourt",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:court_line_detector/mini_court.py",
+      "target": "class:court_line_detector/mini_court.py:MiniCourt",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:court_line_detector/mini_court.py:MiniCourt",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:court_line_detector/mini_court.py:MiniCourt",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:load_homography_matrix",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:court_line_detector/mini_court.py:MiniCourt",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:draw_mini_court_base",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:court_line_detector/mini_court.py:MiniCourt",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:court_line_detector/mini_court.py:MiniCourt",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:draw_points_on_mini_court",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "function:court_line_detector/mini_court.py:MiniCourt:__init__",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:load_homography_matrix",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:court_line_detector/mini_court.py:MiniCourt:draw_points_on_mini_court",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:draw_mini_court_base",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:court_line_detector/mini_court.py:MiniCourt:draw_points_on_mini_court",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/officiating_engine.py",
+      "target": "class:utils/officiating_engine.py:OfficiatingEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/officiating_engine.py",
+      "target": "class:utils/officiating_engine.py:OfficiatingEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/officiating_engine.py",
+      "target": "file:court_line_detector/mini_court.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "class:utils/officiating_engine.py:OfficiatingEngine",
+      "target": "function:utils/officiating_engine.py:OfficiatingEngine:get_line_calls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:utils/officiating_engine.py:OfficiatingEngine",
+      "target": "function:utils/officiating_engine.py:OfficiatingEngine:draw_calls_on_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "function:utils/officiating_engine.py:OfficiatingEngine:get_line_calls",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/stats_telemetry_tracker.py",
+      "target": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/stats_telemetry_tracker.py",
+      "target": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/stats_telemetry_tracker.py",
+      "target": "file:court_line_detector/mini_court.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "target": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "target": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:process_match_telemetry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "target": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:draw_stats_hud",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:__init__",
+      "target": "class:court_line_detector/mini_court.py:MiniCourt",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:process_match_telemetry",
+      "target": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

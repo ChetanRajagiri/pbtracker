@@ -1,0 +1,155 @@
+{
+  "nodes": [
+    {
+      "id": "document:METHODS_AND_RETROSPECTIVE.md",
+      "type": "document",
+      "name": "METHODS_AND_RETROSPECTIVE.md",
+      "filePath": "METHODS_AND_RETROSPECTIVE.md",
+      "summary": "Detailed documentation of the pbtracker technology stack, key geometric and kinematic methods, and a retrospective analysis of failed and successful tracking attempts.",
+      "tags": ["documentation", "architecture", "retrospective", "methods"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Main project documentation detailing the pickleball tracking pipeline, directory structure, quick start installation, post-processing tools, and cached data formats.",
+      "tags": ["documentation", "entry-point", "installation", "pipeline"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:graphify.html",
+      "type": "file",
+      "name": "graphify.html",
+      "filePath": "graphify.html",
+      "summary": "Interactive HTML dashboard displaying a Canvas-based force-directed architecture graph of the pbtracker modules, dependencies, and data flow relationships.",
+      "tags": ["visualization", "dashboard", "architecture", "html", "canvas"],
+      "complexity": "complex",
+      "languageNotes": "Single-file interactive HTML/CSS/JavaScript bundle rendering a Canvas-based force-directed graph."
+    },
+    {
+      "id": "config:pyproject.toml",
+      "type": "config",
+      "name": "pyproject.toml",
+      "filePath": "pyproject.toml",
+      "summary": "Python project configuration file defining dependencies such as boxmot, lapx, opencv-python, streamlit, and ultralytics for the pbtracker project.",
+      "tags": ["configuration", "build-system", "dependencies", "python"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:pyproject.toml",
+      "target": "file:main.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:main.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:trackers/player_tracker.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:trackers/ball_tracker.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:court_line_detector/manual_court_selector.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:utils/tracklet_merger.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:utils/deep_reid_healer.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:app.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:METHODS_AND_RETROSPECTIVE.md",
+      "target": "document:README.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:METHODS_AND_RETROSPECTIVE.md",
+      "target": "file:trackers/player_tracker.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:METHODS_AND_RETROSPECTIVE.md",
+      "target": "file:trackers/ball_tracker.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:METHODS_AND_RETROSPECTIVE.md",
+      "target": "file:utils/tracklet_merger.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:METHODS_AND_RETROSPECTIVE.md",
+      "target": "file:utils/deep_reid_healer.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:METHODS_AND_RETROSPECTIVE.md",
+      "target": "file:app.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:graphify.html",
+      "target": "document:README.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:graphify.html",
+      "target": "file:main.py",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

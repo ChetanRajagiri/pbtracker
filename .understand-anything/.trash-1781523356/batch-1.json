@@ -1,0 +1,530 @@
+{
+  "nodes": [
+    {
+      "id": "file:court_line_detector/manual_court_selector.py",
+      "type": "file",
+      "name": "manual_court_selector.py",
+      "filePath": "court_line_detector/manual_court_selector.py",
+      "summary": "Provides a manual court selector GUI using OpenCV to define and register the 12 key points of a pickleball court.",
+      "tags": ["court-detection", "cv2-gui", "keypoints-selection", "annotation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:court_line_detector/manual_court_selector.py:ManualCourtDetector",
+      "type": "class",
+      "name": "ManualCourtDetector",
+      "filePath": "court_line_detector/manual_court_selector.py",
+      "lineRange": [5, 74],
+      "summary": "Detector class that allows manual annotation of 12 court keypoints on a video frame and saves them for later tracking overlay.",
+      "tags": ["manual-annotation", "court-detector", "cv2-mouse-callback"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.get_keypoints",
+      "type": "function",
+      "name": "ManualCourtDetector.get_keypoints",
+      "filePath": "court_line_detector/manual_court_selector.py",
+      "lineRange": [9, 60],
+      "summary": "Initializes an OpenCV window to collect 12 keypoint locations from user mouse clicks, with stub file loading/saving support.",
+      "tags": ["keypoints-collection", "opencv-mouse-events", "stub-caching"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.draw_keypoints_on_video",
+      "type": "function",
+      "name": "ManualCourtDetector.draw_keypoints_on_video",
+      "filePath": "court_line_detector/manual_court_selector.py",
+      "lineRange": [62, 74],
+      "summary": "Annotates keypoints as labeled circles on a list of video frames for visual confirmation.",
+      "tags": ["video-annotation", "opencv-drawing"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:main.py",
+      "type": "file",
+      "name": "main.py",
+      "filePath": "main.py",
+      "summary": "The main orchestrator and execution entry point of the pickleball tracking and telemetry video processing pipeline.",
+      "tags": ["entry-point", "orchestrator", "video-processing", "pipeline"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:main.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "main.py",
+      "lineRange": [15, 232],
+      "summary": "Initializes detectors/trackers, runs the player and ball detection loops (utilizing stub caches), computes telemetry and officiating calls, and renders the annotated video HUD output.",
+      "tags": ["orchestration-loop", "video-stream", "hud-overlay", "rendering"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:trackers/ball_tracker.py",
+      "type": "file",
+      "name": "ball_tracker.py",
+      "filePath": "trackers/ball_tracker.py",
+      "summary": "Implements the ball tracking system using a YOLO v8/v5 model and Pandas-based interpolation to estimate missing frames.",
+      "tags": ["ball-tracking", "yolo-object-detection", "pandas-interpolation", "computer-vision"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:trackers/ball_tracker.py:BallTracker",
+      "type": "class",
+      "name": "BallTracker",
+      "filePath": "trackers/ball_tracker.py",
+      "lineRange": [7, 144],
+      "summary": "A tracker class responsible for detecting the pickleball across frames and smoothing trajectories using interpolation.",
+      "tags": ["tracker-class", "ball-detection", "bbox-drawing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:trackers/ball_tracker.py:BallTracker.interpolate_ball_positions",
+      "type": "function",
+      "name": "BallTracker.interpolate_ball_positions",
+      "filePath": "trackers/ball_tracker.py",
+      "lineRange": [12, 49],
+      "summary": "Interpolates missing ball positions in a sequence using linear interpolation and backward fill to handle detection flickering.",
+      "tags": ["interpolation", "trajectory-smoothing", "pandas-df"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:trackers/ball_tracker.py:BallTracker.detect_frames",
+      "type": "function",
+      "name": "BallTracker.detect_frames",
+      "filePath": "trackers/ball_tracker.py",
+      "lineRange": [51, 95],
+      "summary": "Performs YOLO inference on a sequence of frames to locate the ball, with optional caching via pickle stub files.",
+      "tags": ["yolo-inference", "object-detection", "stub-caching"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:trackers/ball_tracker.py:BallTracker.draw_bboxes",
+      "type": "function",
+      "name": "BallTracker.draw_bboxes",
+      "filePath": "trackers/ball_tracker.py",
+      "lineRange": [97, 144],
+      "summary": "Annotates the ball bounding boxes and center dots onto frames, using green for detected and pink for interpolated coordinates.",
+      "tags": ["visualization", "opencv-drawing", "bbox-overlay"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:utils/auto_player_filter.py",
+      "type": "file",
+      "name": "auto_player_filter.py",
+      "filePath": "utils/auto_player_filter.py",
+      "summary": "Performs automatic player isolation, spectator purging, and Re-ID mapping using L2-normalized templates and quadrant sorting.",
+      "tags": ["player-filtration", "re-identification", "quadrant-sorting", "court-bounds-filter"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/auto_player_filter.py:expand_polygon_asymmetric",
+      "type": "function",
+      "name": "expand_polygon_asymmetric",
+      "filePath": "utils/auto_player_filter.py",
+      "lineRange": [6, 28],
+      "summary": "Asymmetrically expands a court bounding polygon to include out-of-bounds player positions relative to baseline heights.",
+      "tags": ["polygon-expansion", "coordinate-transform", "court-boundary"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:utils/auto_player_filter.py:AutoPlayerFilter",
+      "type": "class",
+      "name": "AutoPlayerFilter",
+      "filePath": "utils/auto_player_filter.py",
+      "lineRange": [30, 334],
+      "summary": "Filters raw player track detections, purges off-court spectators, and maps remaining tracks to Master IDs 1-4 using appearance embeddings.",
+      "tags": ["filtration-engine", "appearance-embeddings", "reid", "hungarian-matching"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:utils/auto_player_filter.py:AutoPlayerFilter.run_filtration",
+      "type": "function",
+      "name": "AutoPlayerFilter.run_filtration",
+      "filePath": "utils/auto_player_filter.py",
+      "lineRange": [47, 333],
+      "summary": "Executes a seeding pass to lock player template embeddings and a matching pass to filter and align all frames to Master IDs.",
+      "tags": ["reid-pipeline", "consecutive-frames-seeding", "cosine-similarity"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:utils/ball_physics_analyzer.py",
+      "type": "file",
+      "name": "ball_physics_analyzer.py",
+      "filePath": "utils/ball_physics_analyzer.py",
+      "summary": "Analyzes ball trajectory, velocity, and acceleration to detect physics events (bounces and paddle hits) with temporal cooldown constraints.",
+      "tags": ["physics-analysis", "trajectory-events", "velocity-calculation", "cooldown-lockout"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+      "type": "class",
+      "name": "BallPhysicsAnalyzer",
+      "filePath": "utils/ball_physics_analyzer.py",
+      "lineRange": [6, 193],
+      "summary": "Analyzer class that processes ball coordinate stubs to calculate kinematics and identify court bounces and paddle hits.",
+      "tags": ["kinematics-engine", "event-detector", "ball-physics"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.load_and_preprocess",
+      "type": "function",
+      "name": "BallPhysicsAnalyzer.load_and_preprocess",
+      "filePath": "utils/ball_physics_analyzer.py",
+      "lineRange": [14, 58],
+      "summary": "Loads ball tracking stubs, interpolates missing coordinates, and applies a rolling mean window filter to smooth pixel jitter.",
+      "tags": ["data-preprocessing", "pandas-interpolation", "rolling-filter"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.compute_kinematics",
+      "type": "function",
+      "name": "BallPhysicsAnalyzer.compute_kinematics",
+      "filePath": "utils/ball_physics_analyzer.py",
+      "lineRange": [60, 74],
+      "summary": "Computes velocity components, acceleration components, and their magnitudes from smoothed coordinates.",
+      "tags": ["kinematics", "velocity", "acceleration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.detect_events",
+      "type": "function",
+      "name": "BallPhysicsAnalyzer.detect_events",
+      "filePath": "utils/ball_physics_analyzer.py",
+      "lineRange": [76, 173],
+      "summary": "Detects court floor bounces and paddle hits based on acceleration magnitude inflections and velocity sign changes with temporal lockout.",
+      "tags": ["event-detection", "bounce-detection", "hit-detection"],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:main.py",
+      "target": "file:court_line_detector/manual_court_selector.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:court_line_detector/mini_court.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:trackers/ball_tracker.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:trackers/player_tracker.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:utils/auto_player_filter.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:utils/ball_physics_analyzer.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:utils/officiating_engine.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:main.py",
+      "target": "file:utils/stats_telemetry_tracker.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:court_line_detector/manual_court_selector.py",
+      "target": "class:court_line_detector/manual_court_selector.py:ManualCourtDetector",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:court_line_detector/manual_court_selector.py",
+      "target": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.get_keypoints",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:court_line_detector/manual_court_selector.py",
+      "target": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.draw_keypoints_on_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:court_line_detector/manual_court_selector.py",
+      "target": "class:court_line_detector/manual_court_selector.py:ManualCourtDetector",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:main.py",
+      "target": "function:main.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:main.py",
+      "target": "function:main.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:trackers/ball_tracker.py",
+      "target": "class:trackers/ball_tracker.py:BallTracker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:trackers/ball_tracker.py",
+      "target": "function:trackers/ball_tracker.py:BallTracker.interpolate_ball_positions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:trackers/ball_tracker.py",
+      "target": "function:trackers/ball_tracker.py:BallTracker.detect_frames",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:trackers/ball_tracker.py",
+      "target": "function:trackers/ball_tracker.py:BallTracker.draw_bboxes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:trackers/ball_tracker.py",
+      "target": "class:trackers/ball_tracker.py:BallTracker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/auto_player_filter.py",
+      "target": "function:utils/auto_player_filter.py:expand_polygon_asymmetric",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/auto_player_filter.py",
+      "target": "class:utils/auto_player_filter.py:AutoPlayerFilter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/auto_player_filter.py",
+      "target": "function:utils/auto_player_filter.py:AutoPlayerFilter.run_filtration",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/auto_player_filter.py",
+      "target": "function:utils/auto_player_filter.py:expand_polygon_asymmetric",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/auto_player_filter.py",
+      "target": "class:utils/auto_player_filter.py:AutoPlayerFilter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:utils/ball_physics_analyzer.py",
+      "target": "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/ball_physics_analyzer.py",
+      "target": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.load_and_preprocess",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/ball_physics_analyzer.py",
+      "target": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.compute_kinematics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/ball_physics_analyzer.py",
+      "target": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.detect_events",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:utils/ball_physics_analyzer.py",
+      "target": "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:court_line_detector/manual_court_selector.py:ManualCourtDetector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.get_keypoints",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:court_line_detector/mini_court.py:MiniCourt",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:trackers/player_tracker.py:PlayerTracker",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:trackers/ball_tracker.py:BallTracker",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:utils/auto_player_filter.py:AutoPlayerFilter",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:utils/auto_player_filter.py:AutoPlayerFilter.run_filtration",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:trackers/ball_tracker.py:BallTracker.detect_frames",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:trackers/ball_tracker.py:BallTracker.interpolate_ball_positions",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.detect_events",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "class:utils/officiating_engine.py:OfficiatingEngine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:trackers/ball_tracker.py:BallTracker.draw_bboxes",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:main.py:main",
+      "target": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.draw_keypoints_on_video",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:utils/auto_player_filter.py:AutoPlayerFilter.run_filtration",
+      "target": "function:utils/auto_player_filter.py:expand_polygon_asymmetric",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.detect_events",
+      "target": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.compute_kinematics",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.compute_kinematics",
+      "target": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.load_and_preprocess",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

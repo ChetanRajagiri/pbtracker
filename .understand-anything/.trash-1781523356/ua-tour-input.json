@@ -1,0 +1,760 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "file:court_line_detector/manual_court_selector.py",
+        "type": "file",
+        "name": "manual_court_selector.py",
+        "filePath": "court_line_detector/manual_court_selector.py",
+        "summary": "Provides a manual court selector GUI using OpenCV to define and register the 12 key points of a pickleball court.",
+        "tags": [
+          "court-detection",
+          "cv2-gui",
+          "keypoints-selection",
+          "annotation"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "class:court_line_detector/manual_court_selector.py:ManualCourtDetector",
+        "type": "class",
+        "name": "ManualCourtDetector",
+        "filePath": "court_line_detector/manual_court_selector.py",
+        "lineRange": [
+          5,
+          74
+        ],
+        "summary": "Detector class that allows manual annotation of 12 court keypoints on a video frame and saves them for later tracking overlay.",
+        "tags": [
+          "manual-annotation",
+          "court-detector",
+          "cv2-mouse-callback"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.get_keypoints",
+        "type": "function",
+        "name": "ManualCourtDetector.get_keypoints",
+        "filePath": "court_line_detector/manual_court_selector.py",
+        "lineRange": [
+          9,
+          60
+        ],
+        "summary": "Initializes an OpenCV window to collect 12 keypoint locations from user mouse clicks, with stub file loading/saving support.",
+        "tags": [
+          "keypoints-collection",
+          "opencv-mouse-events",
+          "stub-caching"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:court_line_detector/manual_court_selector.py:ManualCourtDetector.draw_keypoints_on_video",
+        "type": "function",
+        "name": "ManualCourtDetector.draw_keypoints_on_video",
+        "filePath": "court_line_detector/manual_court_selector.py",
+        "lineRange": [
+          62,
+          74
+        ],
+        "summary": "Annotates keypoints as labeled circles on a list of video frames for visual confirmation.",
+        "tags": [
+          "video-annotation",
+          "opencv-drawing"
+        ],
+        "complexity": "simple"
+      },
+      {
+        "id": "file:main.py",
+        "type": "file",
+        "name": "main.py",
+        "filePath": "main.py",
+        "summary": "The main orchestrator and execution entry point of the pickleball tracking and telemetry video processing pipeline.",
+        "tags": [
+          "entry-point",
+          "orchestrator",
+          "video-processing",
+          "pipeline"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "function:main.py:main",
+        "type": "function",
+        "name": "main",
+        "filePath": "main.py",
+        "lineRange": [
+          15,
+          232
+        ],
+        "summary": "Initializes detectors/trackers, runs the player and ball detection loops (utilizing stub caches), computes telemetry and officiating calls, and renders the annotated video HUD output.",
+        "tags": [
+          "orchestration-loop",
+          "video-stream",
+          "hud-overlay",
+          "rendering"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "file:trackers/ball_tracker.py",
+        "type": "file",
+        "name": "ball_tracker.py",
+        "filePath": "trackers/ball_tracker.py",
+        "summary": "Implements the ball tracking system using a YOLO v8/v5 model and Pandas-based interpolation to estimate missing frames.",
+        "tags": [
+          "ball-tracking",
+          "yolo-object-detection",
+          "pandas-interpolation",
+          "computer-vision"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "class:trackers/ball_tracker.py:BallTracker",
+        "type": "class",
+        "name": "BallTracker",
+        "filePath": "trackers/ball_tracker.py",
+        "lineRange": [
+          7,
+          144
+        ],
+        "summary": "A tracker class responsible for detecting the pickleball across frames and smoothing trajectories using interpolation.",
+        "tags": [
+          "tracker-class",
+          "ball-detection",
+          "bbox-drawing"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:trackers/ball_tracker.py:BallTracker.interpolate_ball_positions",
+        "type": "function",
+        "name": "BallTracker.interpolate_ball_positions",
+        "filePath": "trackers/ball_tracker.py",
+        "lineRange": [
+          12,
+          49
+        ],
+        "summary": "Interpolates missing ball positions in a sequence using linear interpolation and backward fill to handle detection flickering.",
+        "tags": [
+          "interpolation",
+          "trajectory-smoothing",
+          "pandas-df"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:trackers/ball_tracker.py:BallTracker.detect_frames",
+        "type": "function",
+        "name": "BallTracker.detect_frames",
+        "filePath": "trackers/ball_tracker.py",
+        "lineRange": [
+          51,
+          95
+        ],
+        "summary": "Performs YOLO inference on a sequence of frames to locate the ball, with optional caching via pickle stub files.",
+        "tags": [
+          "yolo-inference",
+          "object-detection",
+          "stub-caching"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:trackers/ball_tracker.py:BallTracker.draw_bboxes",
+        "type": "function",
+        "name": "BallTracker.draw_bboxes",
+        "filePath": "trackers/ball_tracker.py",
+        "lineRange": [
+          97,
+          144
+        ],
+        "summary": "Annotates the ball bounding boxes and center dots onto frames, using green for detected and pink for interpolated coordinates.",
+        "tags": [
+          "visualization",
+          "opencv-drawing",
+          "bbox-overlay"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "file:utils/auto_player_filter.py",
+        "type": "file",
+        "name": "auto_player_filter.py",
+        "filePath": "utils/auto_player_filter.py",
+        "summary": "Performs automatic player isolation, spectator purging, and Re-ID mapping using L2-normalized templates and quadrant sorting.",
+        "tags": [
+          "player-filtration",
+          "re-identification",
+          "quadrant-sorting",
+          "court-bounds-filter"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "function:utils/auto_player_filter.py:expand_polygon_asymmetric",
+        "type": "function",
+        "name": "expand_polygon_asymmetric",
+        "filePath": "utils/auto_player_filter.py",
+        "lineRange": [
+          6,
+          28
+        ],
+        "summary": "Asymmetrically expands a court bounding polygon to include out-of-bounds player positions relative to baseline heights.",
+        "tags": [
+          "polygon-expansion",
+          "coordinate-transform",
+          "court-boundary"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "class:utils/auto_player_filter.py:AutoPlayerFilter",
+        "type": "class",
+        "name": "AutoPlayerFilter",
+        "filePath": "utils/auto_player_filter.py",
+        "lineRange": [
+          30,
+          334
+        ],
+        "summary": "Filters raw player track detections, purges off-court spectators, and maps remaining tracks to Master IDs 1-4 using appearance embeddings.",
+        "tags": [
+          "filtration-engine",
+          "appearance-embeddings",
+          "reid",
+          "hungarian-matching"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "function:utils/auto_player_filter.py:AutoPlayerFilter.run_filtration",
+        "type": "function",
+        "name": "AutoPlayerFilter.run_filtration",
+        "filePath": "utils/auto_player_filter.py",
+        "lineRange": [
+          47,
+          333
+        ],
+        "summary": "Executes a seeding pass to lock player template embeddings and a matching pass to filter and align all frames to Master IDs.",
+        "tags": [
+          "reid-pipeline",
+          "consecutive-frames-seeding",
+          "cosine-similarity"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "file:utils/ball_physics_analyzer.py",
+        "type": "file",
+        "name": "ball_physics_analyzer.py",
+        "filePath": "utils/ball_physics_analyzer.py",
+        "summary": "Analyzes ball trajectory, velocity, and acceleration to detect physics events (bounces and paddle hits) with temporal cooldown constraints.",
+        "tags": [
+          "physics-analysis",
+          "trajectory-events",
+          "velocity-calculation",
+          "cooldown-lockout"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+        "type": "class",
+        "name": "BallPhysicsAnalyzer",
+        "filePath": "utils/ball_physics_analyzer.py",
+        "lineRange": [
+          6,
+          193
+        ],
+        "summary": "Analyzer class that processes ball coordinate stubs to calculate kinematics and identify court bounces and paddle hits.",
+        "tags": [
+          "kinematics-engine",
+          "event-detector",
+          "ball-physics"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.load_and_preprocess",
+        "type": "function",
+        "name": "BallPhysicsAnalyzer.load_and_preprocess",
+        "filePath": "utils/ball_physics_analyzer.py",
+        "lineRange": [
+          14,
+          58
+        ],
+        "summary": "Loads ball tracking stubs, interpolates missing coordinates, and applies a rolling mean window filter to smooth pixel jitter.",
+        "tags": [
+          "data-preprocessing",
+          "pandas-interpolation",
+          "rolling-filter"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.compute_kinematics",
+        "type": "function",
+        "name": "BallPhysicsAnalyzer.compute_kinematics",
+        "filePath": "utils/ball_physics_analyzer.py",
+        "lineRange": [
+          60,
+          74
+        ],
+        "summary": "Computes velocity components, acceleration components, and their magnitudes from smoothed coordinates.",
+        "tags": [
+          "kinematics",
+          "velocity",
+          "acceleration"
+        ],
+        "complexity": "simple"
+      },
+      {
+        "id": "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.detect_events",
+        "type": "function",
+        "name": "BallPhysicsAnalyzer.detect_events",
+        "filePath": "utils/ball_physics_analyzer.py",
+        "lineRange": [
+          76,
+          173
+        ],
+        "summary": "Detects court floor bounces and paddle hits based on acceleration magnitude inflections and velocity sign changes with temporal lockout.",
+        "tags": [
+          "event-detection",
+          "bounce-detection",
+          "hit-detection"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "file:app.py",
+        "type": "file",
+        "name": "app.py",
+        "filePath": "app.py",
+        "summary": "Main Streamlit application that renders the InBound Vision dashboard with match performance statistics, player scorecards, rally logs, and interactive 2D court telemetry plots.",
+        "tags": [
+          "entry-point",
+          "visualization",
+          "streamlit",
+          "dashboard"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "function:app.py:get_video_metadata",
+        "type": "function",
+        "name": "get_video_metadata",
+        "filePath": "app.py",
+        "lineRange": [
+          96,
+          114
+        ],
+        "summary": "Scans the input_videos directory and dynamically resolves the video dimensions, framerate, and total frames using OpenCV.",
+        "tags": [
+          "utility",
+          "video-processing",
+          "metadata"
+        ],
+        "complexity": "simple"
+      },
+      {
+        "id": "function:app.py:load_datasets",
+        "type": "function",
+        "name": "load_datasets",
+        "filePath": "app.py",
+        "lineRange": [
+          150,
+          288
+        ],
+        "summary": "Loads pickle stubs for tracking data and aggregates locomotion statistics, speed calculations, and proximity-based shot attribution for all players.",
+        "tags": [
+          "data-loader",
+          "telemetry",
+          "metrics-aggregation"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "function:app.py:load_rally_log",
+        "type": "function",
+        "name": "load_rally_log",
+        "filePath": "app.py",
+        "lineRange": [
+          294,
+          344
+        ],
+        "summary": "Segments match plays into discrete rallies using a temporal activity gap threshold and compiles shot and bounce analytics per rally.",
+        "tags": [
+          "data-loader",
+          "segmentation",
+          "analytics"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "file:court_line_detector/mini_court.py",
+        "type": "file",
+        "name": "mini_court.py",
+        "filePath": "court_line_detector/mini_court.py",
+        "summary": "Defines the MiniCourt class, which uses homography transformation to project 2D camera coordinates onto a top-down, real-world representation of a Pickleball court.",
+        "tags": [
+          "computer-vision",
+          "homography",
+          "court-mapping",
+          "visualization"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "class:court_line_detector/mini_court.py:MiniCourt",
+        "type": "class",
+        "name": "MiniCourt",
+        "filePath": "court_line_detector/mini_court.py",
+        "lineRange": [
+          414,
+          208
+        ],
+        "summary": "Top-down 2D mapping manager that computes homography matrices, transforms pixel coordinates to court-space feet, and draws players, ball, and officiating calls on a minimap canvas.",
+        "tags": [
+          "mapping-manager",
+          "coordinate-transform",
+          "drawing-utility"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "file:utils/officiating_engine.py",
+        "type": "file",
+        "name": "officiating_engine.py",
+        "filePath": "utils/officiating_engine.py",
+        "summary": "Provides the OfficiatingEngine class, which detects when a ball bounce is IN or OUT and overlays a broadcast-style banner with the call onto the video frame.",
+        "tags": [
+          "officiating",
+          "rule-engine",
+          "video-overlay",
+          "broadcast-graphics"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "class:utils/officiating_engine.py:OfficiatingEngine",
+        "type": "class",
+        "name": "OfficiatingEngine",
+        "filePath": "utils/officiating_engine.py",
+        "lineRange": [
+          6,
+          118
+        ],
+        "summary": "Officiating manager class that computes line calls for bounce events and handles visual overlays of officiating calls.",
+        "tags": [
+          "analytics-engine",
+          "rule-validation",
+          "overlay-renderer"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "file:utils/stats_telemetry_tracker.py",
+        "type": "file",
+        "name": "stats_telemetry_tracker.py",
+        "filePath": "utils/stats_telemetry_tracker.py",
+        "summary": "Provides the StatsTelemetryTracker class, which records and computes locomotion telemetry (speed, distance) and proximity-based hit attribution for individual players, and draws a HUD overlay.",
+        "tags": [
+          "statistics",
+          "locomotion-analytics",
+          "telemetry",
+          "hud-overlay"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+        "type": "class",
+        "name": "StatsTelemetryTracker",
+        "filePath": "utils/stats_telemetry_tracker.py",
+        "lineRange": [
+          7,
+          170
+        ],
+        "summary": "Performance metrics tracker class that aggregates match locomotion data, attributes hits to players, and maintains a historical snapshot of player metrics.",
+        "tags": [
+          "analytics-engine",
+          "data-accumulator",
+          "overlay-renderer"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "document:METHODS_AND_RETROSPECTIVE.md",
+        "type": "document",
+        "name": "METHODS_AND_RETROSPECTIVE.md",
+        "filePath": "METHODS_AND_RETROSPECTIVE.md",
+        "summary": "Detailed documentation of the pbtracker technology stack, key geometric and kinematic methods, and a retrospective analysis of failed and successful tracking attempts.",
+        "tags": [
+          "documentation",
+          "architecture",
+          "retrospective",
+          "methods"
+        ],
+        "complexity": "moderate"
+      },
+      {
+        "id": "document:README.md",
+        "type": "document",
+        "name": "README.md",
+        "filePath": "README.md",
+        "summary": "Main project documentation detailing the pickleball tracking pipeline, directory structure, quick start installation, post-processing tools, and cached data formats.",
+        "tags": [
+          "documentation",
+          "entry-point",
+          "installation",
+          "pipeline"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "file:utils/tracklet_merger.py",
+        "type": "file",
+        "name": "tracklet_merger.py",
+        "filePath": "utils/tracklet_merger.py",
+        "summary": "Post-processing script to heal broken or fragmented tracklets by correlating them using temporal, spatial, and HSV color similarity.",
+        "tags": [
+          "utility",
+          "post-processing",
+          "tracklet-merging",
+          "histogram-correlation"
+        ],
+        "complexity": "complex"
+      },
+      {
+        "id": "file:utils/deep_reid_healer.py",
+        "type": "file",
+        "name": "deep_reid_healer.py",
+        "filePath": "utils/deep_reid_healer.py",
+        "summary": "Post-processing track stitcher that leverages a headless ResNet50 model to extract deep visual embeddings from player crops and stitches fragmented tracklets via cosine similarity.",
+        "tags": [
+          "utility",
+          "neural-network",
+          "re-identification",
+          "resnet50",
+          "pytorch"
+        ],
+        "complexity": "complex"
+      }
+    ],
+    "edges": [
+      {
+        "source": "file:main.py",
+        "target": "file:court_line_detector/manual_court_selector.py",
+        "type": "imports",
+        "direction": "forward",
+        "weight": 0.7
+      },
+      {
+        "source": "file:main.py",
+        "target": "file:court_line_detector/mini_court.py",
+        "type": "imports",
+        "direction": "forward",
+        "weight": 0.7
+      },
+      {
+        "source": "file:main.py",
+        "target": "file:trackers/ball_tracker.py",
+        "type": "imports",
+        "direction": "forward",
+        "weight": 0.7
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:court_line_detector/mini_court.py:MiniCourt",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:trackers/player_tracker.py:PlayerTracker",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:trackers/ball_tracker.py:BallTracker",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:utils/auto_player_filter.py:AutoPlayerFilter",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "function:utils/auto_player_filter.py:AutoPlayerFilter.run_filtration",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:main.py:main",
+        "target": "class:utils/officiating_engine.py:OfficiatingEngine",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "file:app.py",
+        "target": "file:court_line_detector/mini_court.py",
+        "type": "imports",
+        "direction": "forward",
+        "weight": 0.7
+      },
+      {
+        "source": "function:app.py:load_datasets",
+        "target": "class:court_line_detector/mini_court.py:MiniCourt",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "class:utils/officiating_engine.py:OfficiatingEngine",
+        "target": "function:utils/officiating_engine.py:OfficiatingEngine:get_line_calls",
+        "type": "contains",
+        "direction": "forward",
+        "weight": 1.0
+      },
+      {
+        "source": "function:utils/officiating_engine.py:OfficiatingEngine:get_line_calls",
+        "target": "function:court_line_detector/mini_court.py:MiniCourt:transform_point",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      },
+      {
+        "source": "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:__init__",
+        "target": "class:court_line_detector/mini_court.py:MiniCourt",
+        "type": "calls",
+        "direction": "forward",
+        "weight": 0.8
+      }
+    ]
+  },
+  "layers": [
+    {
+      "id": "layer:presentation",
+      "name": "Presentation Layer",
+      "description": "Handles dashboard UI rendering and interactive visualizations.",
+      "nodeIds": [
+        "file:app.py",
+        "file:graphify.html"
+      ]
+    },
+    {
+      "id": "layer:orchestration",
+      "name": "Application Orchestrator",
+      "description": "Acts as the execution entry point and orchestrates the video processing pipeline.",
+      "nodeIds": [
+        "file:main.py"
+      ]
+    },
+    {
+      "id": "layer:tracking-detection",
+      "name": "Computer Vision Trackers",
+      "description": "Implements player and ball tracking systems using YOLO object detection models.",
+      "nodeIds": [
+        "file:trackers/ball_tracker.py",
+        "file:trackers/__init__.py",
+        "file:trackers/player_tracker.py"
+      ]
+    },
+    {
+      "id": "layer:court-geometry",
+      "name": "Court Geometry & Mapping",
+      "description": "Handles homography transformations, perspective projection, and court selector GUI.",
+      "nodeIds": [
+        "file:court_line_detector/manual_court_selector.py",
+        "file:court_line_detector/mini_court.py",
+        "file:court_line_detector/__init__.py"
+      ]
+    },
+    {
+      "id": "layer:officiating-telemetry",
+      "name": "Officiating & Telemetry Engine",
+      "description": "Processes kinematics, attributions, line calls, and HUD telemetry overlays.",
+      "nodeIds": [
+        "file:utils/auto_player_filter.py",
+        "file:utils/ball_physics_analyzer.py",
+        "file:utils/officiating_engine.py",
+        "file:utils/stats_telemetry_tracker.py",
+        "file:utils/__init__.py"
+      ]
+    },
+    {
+      "id": "layer:reid-healing",
+      "name": "Data Healing & Re-ID",
+      "description": "Post-processes and stitches fragmented player tracklets using visual embedding models.",
+      "nodeIds": [
+        "file:utils/tracklet_merger.py",
+        "file:utils/deep_reid_healer.py"
+      ]
+    },
+    {
+      "id": "layer:diagnostics-scratch",
+      "name": "Diagnostics & Scratchpad",
+      "description": "Temporary scripts, one-off analyses, data checks, and frame annotation debug utilities.",
+      "nodeIds": [
+        "file:scratch/analyze_filtration.py",
+        "file:scratch/analyze_std.py",
+        "file:scratch/analyze_stubs.py",
+        "file:scratch/annotate_frames_debug.py",
+        "config:scratch/botsort_custom.yaml",
+        "file:scratch/check_malaysia.py",
+        "file:scratch/check_video_frames.py",
+        "file:scratch/extract_all_raw_crops.py",
+        "file:scratch/extract_final_frames.py",
+        "file:scratch/extract_fine_tuned_frames.py",
+        "file:scratch/extract_malaysia_frames.py",
+        "file:scratch/extract_newvideo_frames.py",
+        "file:scratch/extract_player_crops.py",
+        "file:scratch/generate_raw_tracks.py",
+        "file:scratch/inspect_malaysia_players.py",
+        "file:scratch/prepare_newvideo_stubs.py",
+        "file:scratch/rename_stubs.py",
+        "file:utils/check_ids.py",
+        "file:utils/generate_id_debug_frame.py"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Project Infrastructure & Config",
+      "description": "Configuration files, ignore lists, dependency definitions, and project documentation.",
+      "nodeIds": [
+        "document:METHODS_AND_RETROSPECTIVE.md",
+        "document:README.md",
+        "config:pyproject.toml",
+        "file:.python-version",
+        "file:.understand-anything/.understandignore",
+        "config:.understand-anything/config.json"
+      ]
+    }
+  ]
+}

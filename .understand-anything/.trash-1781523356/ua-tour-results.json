@@ -1,0 +1,106 @@
+{
+  "analyzedAt": "2026-06-15T11:30:00.000Z",
+  "stats": {
+    "totalNodes": 120,
+    "totalEdges": 150,
+    "nodeTypes": {
+      "file": 35,
+      "class": 12,
+      "function": 58,
+      "document": 2,
+      "config": 3
+    }
+  },
+  "centrality": {
+    "mostImported": [
+      {
+        "id": "file:court_line_detector/mini_court.py",
+        "in": 5
+      },
+      {
+        "id": "file:trackers/player_tracker.py",
+        "in": 3
+      },
+      {
+        "id": "file:trackers/ball_tracker.py",
+        "in": 3
+      },
+      {
+        "id": "file:utils/auto_player_filter.py",
+        "in": 2
+      },
+      {
+        "id": "file:court_line_detector/manual_court_selector.py",
+        "in": 2
+      }
+    ],
+    "mostImporting": [
+      {
+        "id": "file:main.py",
+        "out": 8
+      },
+      {
+        "id": "file:app.py",
+        "out": 4
+      },
+      {
+        "id": "file:utils/stats_telemetry_tracker.py",
+        "out": 3
+      },
+      {
+        "id": "file:utils/officiating_engine.py",
+        "out": 2
+      }
+    ]
+  },
+  "layers": [
+    {
+      "layerId": "layer:presentation",
+      "layerName": "Presentation Layer",
+      "nodeCount": 2,
+      "internalEdgesCount": 0,
+      "incomingEdgesCount": 2,
+      "outgoingEdgesCount": 2
+    },
+    {
+      "layerId": "layer:orchestration",
+      "layerName": "Application Orchestrator",
+      "nodeCount": 1,
+      "internalEdgesCount": 0,
+      "incomingEdgesCount": 3,
+      "outgoingEdgesCount": 8
+    },
+    {
+      "layerId": "layer:tracking-detection",
+      "layerName": "Computer Vision Trackers",
+      "nodeCount": 3,
+      "internalEdgesCount": 1,
+      "incomingEdgesCount": 3,
+      "outgoingEdgesCount": 1
+    },
+    {
+      "layerId": "layer:court-geometry",
+      "layerName": "Court Geometry & Mapping",
+      "nodeCount": 3,
+      "internalEdgesCount": 2,
+      "incomingEdgesCount": 6,
+      "outgoingEdgesCount": 0
+    },
+    {
+      "layerId": "layer:officiating-telemetry",
+      "layerName": "Officiating & Telemetry Engine",
+      "nodeCount": 5,
+      "internalEdgesCount": 3,
+      "incomingEdgesCount": 4,
+      "outgoingEdgesCount": 3
+    },
+    {
+      "layerId": "layer:reid-healing",
+      "layerName": "Data Healing & Re-ID",
+      "nodeCount": 2,
+      "internalEdgesCount": 0,
+      "incomingEdgesCount": 2,
+      "outgoingEdgesCount": 0
+    }
+  ]
+}

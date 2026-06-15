@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 42,
+  "totalBatches": 5,
+  "exportsByPath": {
+    ".python-version": [],
+    ".understand-anything/.understandignore": [],
+    "app.py": [
+      "get_video_metadata",
+      "draw_stub_status",
+      "load_datasets",
+      "load_rally_log"
+    ],
+    "court_line_detector/__init__.py": [],
+    "court_line_detector/manual_court_selector.py": [
+      "ManualCourtDetector"
+    ],
+    "court_line_detector/mini_court.py": [
+      "MiniCourt"
+    ],
+    "main.py": [
+      "main"
+    ],
+    "scratch/analyze_filtration.py": [
+      "main"
+    ],
+    "scratch/analyze_std.py": [
+      "main"
+    ],
+    "scratch/analyze_stubs.py": [
+      "main"
+    ],
+    "scratch/annotate_frames_debug.py": [
+      "main"
+    ],
+    "scratch/check_malaysia.py": [],
+    "scratch/check_video_frames.py": [],
+    "scratch/extract_all_raw_crops.py": [
+      "main"
+    ],
+    "scratch/extract_final_frames.py": [
+      "main"
+    ],
+    "scratch/extract_fine_tuned_frames.py": [
+      "main"
+    ],
+    "scratch/extract_malaysia_frames.py": [
+      "main"
+    ],
+    "scratch/extract_newvideo_frames.py": [
+      "main"
+    ],
+    "scratch/extract_player_crops.py": [
+      "main"
+    ],
+    "scratch/generate_raw_tracks.py": [
+      "main"
+    ],
+    "scratch/inspect_malaysia_players.py": [
+      "main"
+    ],
+    "scratch/prepare_newvideo_stubs.py": [
+      "main"
+    ],
+    "scratch/print_frame_0.py": [],
+    "scratch/rename_stubs.py": [
+      "main"
+    ],
+    "trackers/__init__.py": [],
+    "trackers/ball_tracker.py": [
+      "BallTracker"
+    ],
+    "trackers/player_tracker.py": [
+      "expand_polygon_asymmetric",
+      "PlayerTracker"
+    ],
+    "utils/__init__.py": [],
+    "utils/auto_player_filter.py": [
+      "expand_polygon_asymmetric",
+      "AutoPlayerFilter"
+    ],
+    "utils/ball_physics_analyzer.py": [
+      "BallPhysicsAnalyzer"
+    ],
+    "utils/check_ids.py": [],
+    "utils/deep_reid_healer.py": [
+      "get_device",
+      "DeepReIDExtractor",
+      "safe_crop",
+      "segment_tracks",
+      "build_baseline_profiles",
+      "match_fragments",
+      "apply_remap_and_drop",
+      "print_track_summary",
+      "run_healer",
+      "main"
+    ],
+    "utils/generate_id_debug_frame.py": [
+      "main"
+    ],
+    "utils/officiating_engine.py": [
+      "OfficiatingEngine"
+    ],
+    "utils/stats_telemetry_tracker.py": [
+      "StatsTelemetryTracker"
+    ],
+    "utils/tracklet_merger.py": [
+      "bbox_centroid",
+      "euclidean",
+      "crop_player",
+      "hsv_histogram",
+      "build_tracklet_segments",
+      "find_merge_candidates",
+      "score_visual_similarity",
+      "apply_remap",
+      "run_merger",
+      "main"
+    ]
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": "court_line_detector/manual_court_selector.py",
+          "language": "python",
+          "sizeLines": 74,
+          "fileCategory": "code"
+        },
+        {
+          "path": "main.py",
+          "language": "python",
+          "sizeLines": 235,
+          "fileCategory": "code"
+        },
+        {
+          "path": "trackers/ball_tracker.py",
+          "language": "python",
+          "sizeLines": 144,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/auto_player_filter.py",
+          "language": "python",
+          "sizeLines": 348,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/ball_physics_analyzer.py",
+          "language": "python",
+          "sizeLines": 200,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "court_line_detector/manual_court_selector.py": [],
+        "main.py": [
+          "court_line_detector/manual_court_selector.py",
+          "court_line_detector/mini_court.py",
+          "trackers/ball_tracker.py",
+          "trackers/player_tracker.py",
+          "utils/auto_player_filter.py",
+          "utils/ball_physics_analyzer.py",
+          "utils/officiating_engine.py",
+          "utils/stats_telemetry_tracker.py"
+        ],
+        "trackers/ball_tracker.py": [],
+        "utils/auto_player_filter.py": [],
+        "utils/ball_physics_analyzer.py": []
+      },
+      "neighborMap": {
+        "main.py": [
+          {
+            "path": "court_line_detector/mini_court.py",
+            "batchIndex": 2,
+            "symbols": [
+              "MiniCourt"
+            ]
+          },
+          {
+            "path": "trackers/player_tracker.py",
+            "batchIndex": 4,
+            "symbols": [
+              "expand_polygon_asymmetric",
+              "PlayerTracker"
+            ]
+          },
+          {
+            "path": "utils/officiating_engine.py",
+            "batchIndex": 2,
+            "symbols": [
+              "OfficiatingEngine"
+            ]
+          },
+          {
+            "path": "utils/stats_telemetry_tracker.py",
+            "batchIndex": 2,
+            "symbols": [
+              "StatsTelemetryTracker"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": "app.py",
+          "language": "python",
+          "sizeLines": 592,
+          "fileCategory": "code"
+        },
+        {
+          "path": "court_line_detector/mini_court.py",
+          "language": "python",
+          "sizeLines": 208,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/officiating_engine.py",
+          "language": "python",
+          "fileCategory": "code",
+          "sizeLines": 118
+        },
+        {
+          "path": "utils/stats_telemetry_tracker.py",
+          "language": "python",
+          "sizeLines": 170,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "app.py": [
+          "court_line_detector/mini_court.py"
+        ],
+        "court_line_detector/mini_court.py": [],
+        "utils/officiating_engine.py": [
+          "court_line_detector/mini_court.py"
+        ],
+        "utils/stats_telemetry_tracker.py": [
+          "court_line_detector/mini_court.py"
+        ]
+      },
+      "neighborMap": {
+        "court_line_detector/mini_court.py": [
+          {
+            "path": "main.py",
+            "batchIndex": 1,
+            "symbols": [
+              "main"
+            ]
+          }
+        ],
+        "utils/officiating_engine.py": [
+          {
+            "path": "main.py",
+            "batchIndex": 1,
+            "symbols": [
+              "main"
+            ]
+          }
+        ],
+        "utils/stats_telemetry_tracker.py": [
+          {
+            "path": "main.py",
+            "batchIndex": 1,
+            "symbols": [
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": "METHODS_AND_RETROSPECTIVE.md",
+          "language": "markdown",
+          "sizeLines": 77,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "README.md",
+          "language": "markdown",
+          "sizeLines": 289,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "graphify.html",
+          "language": "html",
+          "sizeLines": 896,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "pyproject.toml",
+          "language": "toml",
+          "sizeLines": 20,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "METHODS_AND_RETROSPECTIVE.md": [],
+        "README.md": [],
+        "graphify.html": [],
+        "pyproject.toml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": ".python-version",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".understand-anything/.understandignore",
+          "language": "unknown",
+          "sizeLines": 28,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".understand-anything/config.json",
+          "language": "json",
+          "sizeLines": 3,
+          "fileCategory": "config"
+        },
+        {
+          "path": "court_line_detector/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/analyze_filtration.py",
+          "language": "python",
+          "sizeLines": 89,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/analyze_std.py",
+          "language": "python",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/analyze_stubs.py",
+          "language": "python",
+          "sizeLines": 51,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/annotate_frames_debug.py",
+          "language": "python",
+          "sizeLines": 54,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/botsort_custom.yaml",
+          "language": "yaml",
+          "sizeLines": 16,
+          "fileCategory": "config"
+        },
+        {
+          "path": "scratch/check_malaysia.py",
+          "language": "python",
+          "sizeLines": 5,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/check_video_frames.py",
+          "language": "python",
+          "sizeLines": 10,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/extract_all_raw_crops.py",
+          "language": "python",
+          "sizeLines": 61,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/extract_final_frames.py",
+          "language": "python",
+          "sizeLines": 31,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/extract_fine_tuned_frames.py",
+          "language": "python",
+          "sizeLines": 31,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/extract_malaysia_frames.py",
+          "language": "python",
+          "sizeLines": 31,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/extract_newvideo_frames.py",
+          "language": "python",
+          "sizeLines": 31,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/extract_player_crops.py",
+          "language": "python",
+          "sizeLines": 59,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/generate_raw_tracks.py",
+          "language": "python",
+          "sizeLines": 57,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/inspect_malaysia_players.py",
+          "language": "python",
+          "sizeLines": 27,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/prepare_newvideo_stubs.py",
+          "language": "python",
+          "sizeLines": 30,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/print_frame_0.py",
+          "language": "python",
+          "sizeLines": 8,
+          "fileCategory": "code"
+        },
+        {
+          "path": "scratch/rename_stubs.py",
+          "language": "python",
+          "sizeLines": 17,
+          "fileCategory": "code"
+        },
+        {
+          "path": "trackers/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "trackers/player_tracker.py",
+          "language": "python",
+          "sizeLines": 203,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        ".python-version": [],
+        ".understand-anything/.understandignore": [],
+        ".understand-anything/config.json": [],
+        "court_line_detector/__init__.py": [],
+        "scratch/analyze_filtration.py": [],
+        "scratch/analyze_std.py": [],
+        "scratch/analyze_stubs.py": [],
+        "scratch/annotate_frames_debug.py": [],
+        "scratch/botsort_custom.yaml": [],
+        "scratch/check_malaysia.py": [],
+        "scratch/check_video_frames.py": [],
+        "scratch/extract_all_raw_crops.py": [],
+        "scratch/extract_final_frames.py": [],
+        "scratch/extract_fine_tuned_frames.py": [],
+        "scratch/extract_malaysia_frames.py": [],
+        "scratch/extract_newvideo_frames.py": [],
+        "scratch/extract_player_crops.py": [],
+        "scratch/generate_raw_tracks.py": [
+          "trackers/player_tracker.py"
+        ],
+        "scratch/inspect_malaysia_players.py": [],
+        "scratch/prepare_newvideo_stubs.py": [],
+        "scratch/print_frame_0.py": [],
+        "scratch/rename_stubs.py": [],
+        "trackers/__init__.py": [],
+        "trackers/player_tracker.py": [],
+        "utils/__init__.py": []
+      },
+      "neighborMap": {
+        "trackers/player_tracker.py": [
+          {
+            "path": "main.py",
+            "batchIndex": 1,
+            "symbols": [
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": "utils/check_ids.py",
+          "language": "python",
+          "sizeLines": 14,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/deep_reid_healer.py",
+          "language": "python",
+          "sizeLines": 577,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/generate_id_debug_frame.py",
+          "language": "python",
+          "sizeLines": 103,
+          "fileCategory": "code"
+        },
+        {
+          "path": "utils/tracklet_merger.py",
+          "language": "python",
+          "sizeLines": 313,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "utils/check_ids.py": [],
+        "utils/deep_reid_healer.py": [],
+        "utils/generate_id_debug_frame.py": [],
+        "utils/tracklet_merger.py": []
+      },
+      "neighborMap": {}
+    }
+  ]
+}

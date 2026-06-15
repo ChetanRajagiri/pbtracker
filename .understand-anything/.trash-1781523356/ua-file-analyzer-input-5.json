@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/Users/chetanrajagiri/Desktop/pbtracker",
+  "batchFiles": [
+    {"path": "utils/check_ids.py", "language": "python", "sizeLines": 14, "fileCategory": "code"},
+    {"path": "utils/deep_reid_healer.py", "language": "python", "sizeLines": 577, "fileCategory": "code"},
+    {"path": "utils/generate_id_debug_frame.py", "language": "python", "sizeLines": 103, "fileCategory": "code"},
+    {"path": "utils/tracklet_merger.py", "language": "python", "sizeLines": 313, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "utils/check_ids.py": [],
+    "utils/deep_reid_healer.py": [],
+    "utils/generate_id_debug_frame.py": [],
+    "utils/tracklet_merger.py": []
+  }
+}

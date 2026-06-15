@@ -1,0 +1,135 @@
+[
+  {
+    "order": 1,
+    "title": "Project Overview & Structure",
+    "description": "Start with the README to understand the pbtracker project goals: a computer vision pipeline that tracks players and the ball in pickleball match videos. It explains the directory layout, quick start setup, and 5 sequential pipeline steps.",
+    "nodeIds": [
+      "document:README.md"
+    ]
+  },
+  {
+    "order": 2,
+    "title": "Project Settings and Environment Setup",
+    "description": "Look at pyproject.toml and .python-version to understand the project configuration and target environment (Python 3.12). It defines critical dependencies such as boxmot (BoT-SORT tracker), lapx, opencv-python, streamlit, and ultralytics (YOLOv8).",
+    "nodeIds": [
+      "config:pyproject.toml",
+      "file:.python-version"
+    ]
+  },
+  {
+    "order": 3,
+    "title": "Pipeline Orchestrator Entry Point",
+    "description": "The main.py file acts as the primary execution engine. It defines the main() orchestration loop which initializes tracking models, coordinates frame iteration, loads/saves detection caches (stubs), runs physics and officiating analysis, and renders the annotated video output.",
+    "nodeIds": [
+      "file:main.py",
+      "function:main.py:main"
+    ]
+  },
+  {
+    "order": 4,
+    "title": "Interactive Court Boundary Selection",
+    "description": "The manual_court_selector.py script provides an interactive OpenCV GUI tool. It runs on the first frame of a match video, requiring the user to click exactly 12 court boundary keypoints. These coordinates are cached to verify on-court containment and project coordinates to physical space.",
+    "nodeIds": [
+      "file:court_line_detector/manual_court_selector.py",
+      "class:court_line_detector/manual_court_selector.py:ManualCourtDetector"
+    ]
+  },
+  {
+    "order": 5,
+    "title": "Multi-Player Detection and Tracking",
+    "description": "The player_tracker.py module is responsible for loading the pre-trained YOLOv8x model and tracking players across video frames. It uses expand_polygon_asymmetric() to expand the court boundary polygon, verifying if players are actively on-court or spectators off-court.",
+    "nodeIds": [
+      "file:trackers/player_tracker.py",
+      "class:trackers/player_tracker.py:PlayerTracker",
+      "function:trackers/player_tracker.py:expand_polygon_asymmetric"
+    ]
+  },
+  {
+    "order": 6,
+    "title": "Pickleball Trajectory Tracking & Interpolation",
+    "description": "The ball_tracker.py module uses a fine-tuned YOLOv5 model to detect the pickleball. Since ball detection often flickers due to fast movement and occlusion, it uses interpolate_ball_positions() which applies Pandas linear interpolation and back-filling to estimate missing frames.",
+    "nodeIds": [
+      "file:trackers/ball_tracker.py",
+      "class:trackers/ball_tracker.py:BallTracker",
+      "function:trackers/ball_tracker.py:BallTracker.interpolate_ball_positions"
+    ]
+  },
+  {
+    "order": 7,
+    "title": "Top-Down Court Projection (Homography)",
+    "description": "The mini_court.py module performs top-down 2D court mapping. It uses OpenCV to calculate a 3x3 homography matrix mapping perspective-distorted pixel points to physical ground-level coordinates in feet. This is crucial for accurate kinematics and bounce localization.",
+    "nodeIds": [
+      "file:court_line_detector/mini_court.py",
+      "class:court_line_detector/mini_court.py:MiniCourt",
+      "function:court_line_detector/mini_court.py:MiniCourt:transform_point"
+    ]
+  },
+  {
+    "order": 8,
+    "title": "Ball Physics & Kinematics Engine",
+    "description": "The ball_physics_analyzer.py module processes ball coordinates over time. It computes instantaneous velocity and acceleration components, using change points and temporal cooldown locks to automatically detect paddle hits and court floor bounces.",
+    "nodeIds": [
+      "file:utils/ball_physics_analyzer.py",
+      "class:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer",
+      "function:utils/ball_physics_analyzer.py:BallPhysicsAnalyzer.detect_events"
+    ]
+  },
+  {
+    "order": 9,
+    "title": "Officiating & Line Boundary Decisions",
+    "description": "The officiating_engine.py module handles automated referee calls. It maps court bounces detected by the physics analyzer to the physical court boundary lines. It determines if a bounce is IN or OUT and overlays large colored banners on the video stream.",
+    "nodeIds": [
+      "file:utils/officiating_engine.py",
+      "class:utils/officiating_engine.py:OfficiatingEngine",
+      "function:utils/officiating_engine.py:OfficiatingEngine:get_line_calls"
+    ]
+  },
+  {
+    "order": 10,
+    "title": "Kinematic Telemetry & HUD Overlays",
+    "description": "The stats_telemetry_tracker.py module calculates locomotion statistics for players, including running speed and total distance covered. It also detects paddle hits based on player-to-ball proximity and draws the top HUD overlay showing stats for each player.",
+    "nodeIds": [
+      "file:utils/stats_telemetry_tracker.py",
+      "class:utils/stats_telemetry_tracker.py:StatsTelemetryTracker",
+      "function:utils/stats_telemetry_tracker.py:StatsTelemetryTracker:process_match_telemetry"
+    ]
+  },
+  {
+    "order": 11,
+    "title": "Spatio-Temporal & HSV Track Stitching",
+    "description": "The tracklet_merger.py script acts as the first-level track healer. It resolves fragmented tracker IDs by analyzing spatial centroid distance, temporal gaps, and visual similarity of players (computed via OpenCV HSV color histogram correlation).",
+    "nodeIds": [
+      "file:utils/tracklet_merger.py",
+      "function:utils/tracklet_merger.py:find_merge_candidates",
+      "function:utils/tracklet_merger.py:score_visual_similarity"
+    ]
+  },
+  {
+    "order": 12,
+    "title": "Deep Neural Re-ID Identity Healing",
+    "description": "The deep_reid_healer.py module runs deep learning-based identity recovery. It extracts 2048-dimensional appearance embeddings from player crops using a PyTorch ResNet50 model, matching late-appearing fragment tracks to baseline master profiles via cosine similarity.",
+    "nodeIds": [
+      "file:utils/deep_reid_healer.py",
+      "class:utils/deep_reid_healer.py:DeepReIDExtractor",
+      "function:utils/deep_reid_healer.py:build_baseline_profiles"
+    ]
+  },
+  {
+    "order": 13,
+    "title": "Interactive Performance Dashboard",
+    "description": "The app.py script mounts a Streamlit dashboard. It loads the cached player locomotion metrics, physics events, and rally logs to render interactive movement heatmaps, speed over time plots, and game summaries using Plotly visualizations.",
+    "nodeIds": [
+      "file:app.py",
+      "function:app.py:load_datasets",
+      "function:app.py:load_rally_log"
+    ]
+  },
+  {
+    "order": 14,
+    "title": "Project Methodology & Algorithm Analysis",
+    "description": "End the tour with METHODS_AND_RETROSPECTIVE.md. It documents the mathematical and geometrical formulas behind court homography, coordinate mapping, physics thresholding, and details failed tracking approaches and future improvements.",
+    "nodeIds": [
+      "document:METHODS_AND_RETROSPECTIVE.md"
+    ]
+  }
+]

@@ -1,0 +1,103 @@
+{
+  "analyzedAt": "2026-06-15T16:55:00.000Z",
+  "totalFiles": 41,
+  "layers": [
+    {
+      "id": "layer:presentation",
+      "name": "Presentation Layer",
+      "nodeCount": 2,
+      "nodeIds": [
+        "file:app.py",
+        "file:graphify.html"
+      ]
+    },
+    {
+      "id": "layer:orchestration",
+      "name": "Application Orchestrator",
+      "nodeCount": 1,
+      "nodeIds": [
+        "file:main.py"
+      ]
+    },
+    {
+      "id": "layer:tracking-detection",
+      "name": "Computer Vision Trackers",
+      "nodeCount": 3,
+      "nodeIds": [
+        "file:trackers/ball_tracker.py",
+        "file:trackers/__init__.py",
+        "file:trackers/player_tracker.py"
+      ]
+    },
+    {
+      "id": "layer:court-geometry",
+      "name": "Court Geometry & Mapping",
+      "nodeCount": 3,
+      "nodeIds": [
+        "file:court_line_detector/manual_court_selector.py",
+        "file:court_line_detector/mini_court.py",
+        "file:court_line_detector/__init__.py"
+      ]
+    },
+    {
+      "id": "layer:officiating-telemetry",
+      "name": "Officiating & Telemetry Engine",
+      "nodeCount": 5,
+      "nodeIds": [
+        "file:utils/auto_player_filter.py",
+        "file:utils/ball_physics_analyzer.py",
+        "file:utils/officiating_engine.py",
+        "file:utils/stats_telemetry_tracker.py",
+        "file:utils/__init__.py"
+      ]
+    },
+    {
+      "id": "layer:reid-healing",
+      "name": "Data Healing & Re-ID",
+      "nodeCount": 2,
+      "nodeIds": [
+        "file:utils/tracklet_merger.py",
+        "file:utils/deep_reid_healer.py"
+      ]
+    },
+    {
+      "id": "layer:diagnostics-scratch",
+      "name": "Diagnostics & Scratchpad",
+      "nodeCount": 20,
+      "nodeIds": [
+        "file:scratch/analyze_filtration.py",
+        "file:scratch/analyze_std.py",
+        "file:scratch/analyze_stubs.py",
+        "file:scratch/annotate_frames_debug.py",
+        "config:scratch/botsort_custom.yaml",
+        "file:scratch/check_malaysia.py",
+        "file:scratch/check_video_frames.py",
+        "file:scratch/extract_all_raw_crops.py",
+        "file:scratch/extract_final_frames.py",
+        "file:scratch/extract_fine_tuned_frames.py",
+        "file:scratch/extract_malaysia_frames.py",
+        "file:scratch/extract_newvideo_frames.py",
+        "file:scratch/extract_player_crops.py",
+        "file:scratch/generate_raw_tracks.py",
+        "file:scratch/inspect_malaysia_players.py",
+        "file:scratch/prepare_newvideo_stubs.py",
+        "file:scratch/rename_stubs.py",
+        "file:utils/check_ids.py",
+        "file:utils/generate_id_debug_frame.py"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Project Infrastructure & Config",
+      "nodeCount": 6,
+      "nodeIds": [
+        "document:METHODS_AND_RETROSPECTIVE.md",
+        "document:README.md",
+        "config:pyproject.toml",
+        "file:.python-version",
+        "file:.understand-anything/.understandignore",
+        "config:.understand-anything/config.json"
+      ]
+    }
+  ]
+}
