@@ -225,6 +225,20 @@ class AutoPlayerFilter:
                             lock_frame = idx
 
         # Matching Pass: Map all frames (retroactively and forward) against locked gallery
+        self.osnet_direct_match_count = 0
+        self.tie_break_resolved_count = 0
+        self.court_side_fallback_count = 0
+        self.unresolved_count = 0
+        self.court_side_fallback_logs = []
+        self.tiebreak_logs = []
+        
+        last_known_positions = {}
+        if gallery_seeded:
+            for raw_tid, master_id in id_mapping.items():
+                if raw_tid in gallery_bboxes and len(gallery_bboxes[raw_tid]) > 0:
+                    bboxes = gallery_bboxes[raw_tid]
+                    last_known_positions[master_id] = (np.mean([(b[0]+b[2])/2.0 for b in bboxes]), np.mean([(b[1]+b[3])/2.0 for b in bboxes]))
+
         cleaned_detections = []
         for idx, frame_dict in enumerate(self.player_detections):
             frame_clean = {}
@@ -240,7 +254,111 @@ class AutoPlayerFilter:
                     if emb is None or bbox is None:
                         continue
                         
-                    # Verify foot area passes expanded polygon test using 3-point check
+                    # Normalize embedding
+                    norm_emb = emb / (np.linalg.norm(emb) + 1e-6)
+                    
+                    # Cosine Similarity matching against Master players
+                    scores = []
+                    for master_id, gal_emb in locked_gallery.items():
+                        sim = np.dot(norm_emb, gal_emb)
+                        scores.append((master_id, sim))
+                        
+                    scores.sort(key=lambda x: x[1], reverse=True)
+                    best_master_id = scores[0][0]
+                    best_sim = scores[0][1]
+                    
+                    assigned_master_id = None
+                    resolved_by_tie_break = False
+                    
+                    if best_sim > 0.35:
+                        if len(scores) >= 2:
+                            second_master_id = scores[1][0]
+                            second_sim = scores[1][1]
+                            
+                            TIE_BREAK_MARGIN = 0.05
+                            if best_sim - second_sim <= TIE_BREAK_MARGIN:
+                                track_cx = (bbox[0] + bbox[2]) / 2.0
+                                track_cy = (bbox[1] + bbox[3]) / 2.0
+                                
+                                pos1 = last_known_positions.get(best_master_id)
+                                pos2 = last_known_positions.get(second_master_id)
+                                
+                                dist1 = float('inf')
+                                dist2 = float('inf')
+                                
+                                if pos1:
+                                    dist1 = np.linalg.norm([track_cx - pos1[0], track_cy - pos1[1]])
+                                if pos2:
+                                    dist2 = np.linalg.norm([track_cx - pos2[0], track_cy - pos2[1]])
+                                    
+                                winning_master = best_master_id
+                                losing_master = second_master_id
+                                if dist2 < dist1:
+                                    best_master_id = second_master_id
+                                    best_sim = second_sim
+                                    resolved_by_tie_break = True
+                                    winning_master = second_master_id
+                                    losing_master = scores[0][0]
+                                else:
+                                    resolved_by_tie_break = True  # It was evaluated via tie break logic
+                                    
+                                # Log tie break event
+                                self.tiebreak_logs.append({
+                                    'frame_index': idx,
+                                    'master_id': winning_master,
+                                    'top_score': scores[0][1],
+                                    'second_score': scores[1][1],
+                                    'score_gap': scores[0][1] - scores[1][1],
+                                    'winning_raw_id': raw_tid,
+                                    'losing_raw_id': losing_master
+                                })
+                                    
+                        assigned_master_id = best_master_id
+
+                    if assigned_master_id is not None:
+                        if assigned_master_id in frame_clean:
+                            prev_sim = frame_clean[assigned_master_id]['similarity']
+                            if best_sim > prev_sim:
+                                # Overridden track goes to unmatched_tracks
+                                prev_bbox = frame_clean[assigned_master_id]['bbox']
+                                prev_raw_tid = frame_clean[assigned_master_id].get('raw_tid', -1)
+                                unmatched_tracks.append({'bbox': prev_bbox, 'raw_tid': prev_raw_tid})
+                                frame_clean[assigned_master_id] = {
+                                    'bbox': bbox,
+                                    'is_on_court': True,
+                                    'similarity': best_sim,
+                                    'resolved_by': 'tie_break' if resolved_by_tie_break else 'direct',
+                                    'raw_tid': raw_tid
+                                }
+                            else:
+                                unmatched_tracks.append({'bbox': bbox, 'raw_tid': raw_tid})
+                        else:
+                            frame_clean[assigned_master_id] = {
+                                    'bbox': bbox,
+                                    'is_on_court': True,
+                                    'similarity': best_sim,
+                                    'resolved_by': 'tie_break' if resolved_by_tie_break else 'direct',
+                                    'raw_tid': raw_tid
+                            }
+                    else:
+                        unmatched_tracks.append({'bbox': bbox, 'raw_tid': raw_tid})
+                        
+                for mid, val in frame_clean.items():
+                    res_by = val.get('resolved_by')
+                    if res_by == 'direct':
+                        self.osnet_direct_match_count += 1
+                    elif res_by == 'tie_break':
+                        self.tie_break_resolved_count += 1
+                    
+                    b = val['bbox']
+                    last_known_positions[mid] = ((b[0]+b[2])/2.0, (b[1]+b[3])/2.0)
+
+                # Fallback Assignment: assign unmatched tracks inside court to nearest unoccupied ID
+                for item in unmatched_tracks:
+                    bbox = item['bbox']
+                    raw_tid = item['raw_tid']
+                    
+                    # Filter by polygon before fallback
                     is_inside = True
                     if polygon is not None:
                         pt1 = (bbox[0], bbox[3])
@@ -253,46 +371,10 @@ class AutoPlayerFilter:
                         )
                         
                     if not is_inside:
-                        continue  # Skip embedding extraction / gallery matching
-                        
-                    # Normalize embedding
-                    norm_emb = emb / (np.linalg.norm(emb) + 1e-6)
-                    
-                    # Cosine Similarity matching against Master players
-                    best_master_id = None
-                    best_sim = -1.0
-                    for master_id, gal_emb in locked_gallery.items():
-                        sim = np.dot(norm_emb, gal_emb)
-                        if sim > best_sim:
-                            best_sim = sim
-                            best_master_id = master_id
-                            
-                    if best_master_id is not None and best_sim > 0.35:
-                        if best_master_id in frame_clean:
-                            prev_sim = frame_clean[best_master_id]['similarity']
-                            if best_sim > prev_sim:
-                                # Overridden track goes to unmatched_tracks
-                                prev_bbox = frame_clean[best_master_id]['bbox']
-                                unmatched_tracks.append(prev_bbox)
-                                frame_clean[best_master_id] = {
-                                    'bbox': bbox,
-                                    'is_on_court': True,
-                                    'similarity': best_sim
-                                }
-                            else:
-                                unmatched_tracks.append(bbox)
-                        else:
-                            frame_clean[best_master_id] = {
-                                    'bbox': bbox,
-                                    'is_on_court': True,
-                                    'similarity': best_sim
-                            }
-                    else:
-                        unmatched_tracks.append(bbox)
+                        continue
 
-                # Fallback Assignment: assign unmatched tracks inside court to nearest unoccupied ID
-                for bbox in unmatched_tracks:
                     foot_y = bbox[3]
+                    assigned = False
                     if foot_y > frame_height * 0.5:
                         # Near side (IDs 1 and 2)
                         assigned_near = [id_ for id_ in [1, 2] if id_ in frame_clean]
@@ -304,6 +386,14 @@ class AutoPlayerFilter:
                                 'is_on_court': True,
                                 'similarity': 0.0
                             }
+                            self.court_side_fallback_count += 1
+                            self.court_side_fallback_logs.append({
+                                'frame': idx,
+                                'raw_tid': raw_tid,
+                                'master_id': vacant_id
+                            })
+                            last_known_positions[vacant_id] = ((bbox[0]+bbox[2])/2.0, (bbox[1]+bbox[3])/2.0)
+                            assigned = True
                     else:
                         # Far side (IDs 3 and 4)
                         assigned_far = [id_ for id_ in [3, 4] if id_ in frame_clean]
@@ -315,6 +405,17 @@ class AutoPlayerFilter:
                                 'is_on_court': True,
                                 'similarity': 0.0
                             }
+                            self.court_side_fallback_count += 1
+                            self.court_side_fallback_logs.append({
+                                'frame': idx,
+                                'raw_tid': raw_tid,
+                                'master_id': vacant_id
+                            })
+                            last_known_positions[vacant_id] = ((bbox[0]+bbox[2])/2.0, (bbox[1]+bbox[3])/2.0)
+                            assigned = True
+                            
+                    if not assigned:
+                        self.unresolved_count += 1
                             
             # Remove similarity key and format cleanly
             final_frame_dict = {}
@@ -330,6 +431,30 @@ class AutoPlayerFilter:
             pickle.dump(cleaned_detections, f)
             
         print(f"[REID] Successfully mapped all frames to Master IDs 1-4. Saved to {self.detections_pkl}")
+        
+        # Save tiebreak logs
+        tiebreak_csv = 'tracker_stubs/tiebreak_events.csv'
+        try:
+            import csv
+            with open(tiebreak_csv, 'w', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=['frame_index', 'master_id', 'top_score', 'second_score', 'score_gap', 'winning_raw_id', 'losing_raw_id'])
+                writer.writeheader()
+                for row in self.tiebreak_logs:
+                    writer.writerow(row)
+            print(f"[INSTRUMENTATION] Saved tie-break events to {tiebreak_csv}")
+        except Exception as e:
+            print(f"[WARNING] Failed to write tiebreak_events.csv: {e}")
+        
+        total_assignments = self.osnet_direct_match_count + self.tie_break_resolved_count + self.court_side_fallback_count + self.unresolved_count
+        if total_assignments > 0:
+            print("\n[INSTRUMENTATION] Filtration Summary:")
+            print(f"  - Total assignments attempted: {total_assignments}")
+            print(f"  - Direct OSNet matches: {self.osnet_direct_match_count} ({(self.osnet_direct_match_count/total_assignments)*100:.1f}%)")
+            print(f"  - Tie-break resolved: {self.tie_break_resolved_count} ({(self.tie_break_resolved_count/total_assignments)*100:.1f}%)")
+            print(f"  - Positional Fallback: {self.court_side_fallback_count} ({(self.court_side_fallback_count/total_assignments)*100:.1f}%)")
+            print(f"  - Unresolved (Dropped): {self.unresolved_count} ({(self.unresolved_count/total_assignments)*100:.1f}%)")
+            print(f"  - Fallback logs: {len(self.court_side_fallback_logs)}")
+            
         return cleaned_detections
 
 if __name__ == "__main__":

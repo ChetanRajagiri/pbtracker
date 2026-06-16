@@ -15,6 +15,7 @@ wheels/
 
 # Cached tracking data
 tracker_stubs/*.pkl
+tracker_stubs/*.csv
 
 # Video files
 input_videos/*.mp4

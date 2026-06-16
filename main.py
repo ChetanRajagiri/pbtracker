@@ -99,6 +99,13 @@ def main():
         need_filtration = True
         
     if need_filtration:
+        # Save pre-filtration raw detections to tracker_stubs/player_detections_raw.pkl
+        raw_stub_path = "tracker_stubs/player_detections_raw.pkl"
+        os.makedirs(os.path.dirname(raw_stub_path), exist_ok=True)
+        with open(raw_stub_path, 'wb') as f:
+            pickle.dump(player_detections, f)
+        print(f"[PIPELINE] Saved raw pre-filtration detections to: {raw_stub_path}")
+
         # Run AutoPlayerFilter to clean the detections
         print("Applying automatic player isolation and spectator purging...")
         player_filter = AutoPlayerFilter(detections_pkl=player_stub_path, court_pkl=court_stub_path, video_path=video_path)

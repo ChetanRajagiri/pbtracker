@@ -8,23 +8,20 @@ A computer vision pipeline for **tracking players and the ball** in pickleball m
 
 ```
 pbtracker/
-├── main.py                          # Main pipeline entry point
+├── main.py                          # Main pipeline entry point (Detection + ReID Filter + Ball Tracker)
 ├── pyproject.toml                   # Project config & dependencies
 │
 ├── trackers/                        # Core tracking modules
-│   ├── player_tracker.py            #   YOLO-based player detection + court polygon filtering
+│   ├── player_tracker.py            #   YOLO-based tiled player detection + court filtering
 │   └── ball_tracker.py              #   YOLO-based ball detection + Pandas interpolation
 │
 ├── court_line_detector/             # Court boundary detection
 │   └── manual_court_selector.py     #   Interactive 12-point court keypoint selector (OpenCV GUI)
 │
-├── utils/                           # Post-processing & track healing
-│   ├── tracklet_merger.py           #   Spatio-temporal + HSV histogram track stitching
-│   └── deep_reid_healer.py          #   ResNet50-based deep re-ID for broken track recovery
-│
-├── debug/                           # Debugging & diagnostic scripts
-│   ├── debug_players.py             #   Visualise court polygon & player containment
-│   └── yolo_inference.py            #   Standalone single-frame YOLO inference test
+├── utils/                           # Post-processing & diagnostics
+│   ├── auto_player_filter.py        #   Identity-first ReID matching, spatial tie-breaker & fallbacks
+│   ├── debug_missing_box.py         #   Trace missing bboxes and similarity scores for raw tracks
+│   └── extract_crossover_frames.py  #   Identify crossover frames for verification
 │
 ├── models/                          # YOLO model weights (git-ignored)
 │   └── yolo5_last.pt                #   Fine-tuned YOLOv5 ball detection model
@@ -75,7 +72,7 @@ uv sync
 
 ## 🏃 Pipeline Steps
 
-The pipeline runs in **5 sequential stages**. Each stage caches its output as a `.pkl` stub so subsequent runs skip expensive inference.
+The pipeline runs in **4 sequential stages**. Each stage caches its output as a `.pkl` stub so subsequent runs skip expensive inference.
 
 ### Step 1 — Court Keypoint Selection
 
@@ -83,97 +80,50 @@ The pipeline runs in **5 sequential stages**. Each stage caches its output as a 
 main.py → ManualCourtDetector.get_keypoints()
 ```
 
-On first run, an OpenCV window pops up showing Frame 0. **Click exactly 12 points** marking the court lines (baselines, service lines, center lines). These define the court boundary polygon used to classify players as on-court or off-court.
+On first run, an OpenCV window pops up showing Frame 0. **Click exactly 12 points** marking the court lines.
 
 > Cached to: `tracker_stubs/court_keypoints.pkl`
 
-### Step 2 — Player Detection & Tracking
+### Step 2 — Tiled Player Detection & Tracking
 
 ```
 main.py → PlayerTracker.detect_frames()
 ```
 
-Runs **YOLOv8x** with `model.track(persist=True)` for multi-object tracking. Each detected person gets a persistent Track ID. A polygon containment test marks each player as `is_on_court: true/false`.
+Runs **YOLOv8x** using a horizontal tiled/cropped approach (separating the far-court and near-court regions to maintain resolution for small players). Outputs are merged and deduplicated using IoU.
 
 > Cached to: `tracker_stubs/player_detections.pkl`
 
-### Step 3 — Ball Detection
+### Step 3 — Appearance-Based Player Filtration
+
+```
+main.py → AutoPlayerFilter.run_filtration()
+```
+
+Performs:
+1. **Gallery Seeding:** Seeds a locked appearance profile (OSNet embeddings) for all 4 players during the first stable frames.
+2. **Identity-First ReID Matching:** Matches subsequent detections directly against the locked templates (threshold > 0.35).
+3. **Spatial Tie-Breaker:** Resolves matching ambiguities within a 0.05 margin using spatial continuity (closest distance to last known coordinate).
+4. **Positional Fallback:** Automatically assigns unmatched in-court detections to vacant slots on their respective court half.
+
+### Step 4 — Ball Detection & Interpolation
 
 ```
 main.py → BallTracker.detect_frames()
 ```
 
-Runs a **fine-tuned YOLOv5** model to detect the pickleball in each frame.
-
-> Cached to: `tracker_stubs/ball_detections.pkl`
-
-### Step 4 — Ball Position Interpolation
-
-```
-main.py → BallTracker.interpolate_ball_positions()
-```
-
-Uses **Pandas linear interpolation** to fill gaps where the ball wasn't detected (motion blur, occlusion). Each position is tagged as `detected` or `interpolated`.
+Runs a **fine-tuned YOLOv5** model to detect the pickleball, and fills gaps using **Pandas linear interpolation** to resolve fast-motion blur and occlusions.
 
 ### Step 5 — Annotation & Video Export
 
-```
-main.py → draw_bboxes() for players, ball, and court keypoints
-```
-
 Renders the final annotated video with:
-- **Player bounding boxes** — green (on-court) / orange (off-court) with Track ID labels
-- **Ball markers** — green box (YOLO detected) / pink box (Pandas interpolated)
-- **Court keypoints** — blue numbered dots
-- **Frame counter** — top-right corner
+- **Player bounding boxes** — Active player Master IDs `[1, 2, 3, 4]` labeled cleanly.
+- **Ball markers** — green box (YOLO detected) / pink box (Pandas interpolated).
+- **Court keypoints & Net boundary** — blue numbered dots and horizontal net split lines.
 
 > Output: `output_videos/player_tracking_test.mp4`
 
 ---
-
-## 🔧 Post-Processing Tools
-
-After the main pipeline runs, use these standalone scripts to heal broken tracking IDs.
-
-### Tracklet Merger (HSV Histogram Correlation)
-
-Stitches broken track IDs using **spatio-temporal proximity** and **HSV color histogram matching**.
-
-```bash
-# Run with defaults (45-frame window, 150px distance, 0.85 histogram threshold)
-uv run python utils/tracklet_merger.py
-
-# Custom thresholds
-uv run python utils/tracklet_merger.py --temporal 60 --spatial 200 --hist 0.80
-```
-
-| Gate | Default | Description |
-|---|---|---|
-| Temporal | 45 frames | Max gap between old track ending and new track starting |
-| Spatial | 150 px | Max centroid distance between ending/starting bboxes |
-| Visual | 0.85 | Min HSV histogram correlation (cv2.HISTCMP_CORREL) |
-
-### Deep Re-ID Healer (ResNet50 Neural Matching)
-
-Uses a **headless ResNet50** backbone to extract 2048-D visual embeddings and match fragment tracklets against baseline identity profiles via **cosine similarity**.
-
-```bash
-# Run with defaults (0.88 cosine threshold)
-uv run python utils/deep_reid_healer.py
-
-# Auto-strip all noise tracks, keeping only primary players
-uv run python utils/deep_reid_healer.py --drop-noise
-
-# Custom keep set
-uv run python utils/deep_reid_healer.py --drop-noise --keep 1 2 3 4 5
-
-# Manually drop specific IDs
-uv run python utils/deep_reid_healer.py --drop 8 15 56
-
-# Adjust thresholds
-uv run python utils/deep_reid_healer.py --threshold 0.90 --profile-frames 200
-```
-
 
 ## 📊 Analytics Dashboard
 
@@ -193,17 +143,10 @@ uv run streamlit run app.py
 
 ## 🔄 Recommended Workflow
 
+Everything runs end-to-end automatically:
+
 ```bash
-# 1. Run the main pipeline (first run triggers court selection GUI)
-uv run python main.py
-
-# 2. Heal fragmented track IDs with histogram matching
-uv run python utils/tracklet_merger.py
-
-# 3. Deep neural re-ID healing for large temporal gaps
-uv run python utils/deep_reid_healer.py --drop-noise
-
-# 4. Re-render the output video with healed tracking data
+# Run the entire pipeline
 uv run python main.py
 ```
 
@@ -217,6 +160,9 @@ rm tracker_stubs/*.pkl
 
 # Clear only player tracking (forces YOLO re-run)
 rm tracker_stubs/player_detections.pkl
+
+# Clear raw pre-filtration detections
+rm tracker_stubs/player_detections_raw.pkl
 
 # Clear only ball tracking
 rm tracker_stubs/ball_detections.pkl
