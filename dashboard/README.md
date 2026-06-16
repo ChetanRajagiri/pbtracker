@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# 🏓 InBound Vision — Interactive Video Player Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium React + TypeScript + Vite frontend application designed for analyzing and visualizing pickleball matches with interactive canvas-based tracking layers.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠 Features & Layers
 
-## React Compiler
+The dashboard overlays analytics data dynamically on top of the raw match video using an interactive HTML5 `<canvas>` synced frame-by-frame:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Ball (Bounce Trail)**: Renders a glowing neon green arc representing the trajectory of the ball starting from its most recent bounce up to the next bounce event, fading historical coordinates smoothly.
+2. **Players (Footprint Rings)**: Draws perspective-aligned floor footprint ellipses (styled with semi-transparent color fills matching the Indian Pickleball League broadcast scheme) at the feet of the four active players, along with named label tags centered above their heads.
+3. **Bounces (Ripple Effect)**: Renders concentric expanding and fading white ripple rings at the exact coordinate where a bounce occurs for 24 frames after the event.
+4. **Court & Net Outline**: Connects the 12 manual calibration keypoints with bright yellow lines to display baseline boundary limits and kitchen lines, with the net line highlighted in a clean white outline.
+5. **HUD Stats**: Shows a dedicated overlay displaying current playback metrics (current Frame vs Total Frames, and timestamp in milliseconds).
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
+Make sure you have **Node.js** and **npm** installed on your system.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### How to Run Locally
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Export JSON Data from Pipeline stubs**:
+   First, make sure to generate the necessary data feeds from your Python tracking stubs. Run this from the root directory:
+   ```bash
+   uv run python utils/export_json.py
+   ```
+   *This exports `court_keypoints.json`, `player_detections.json`, `ball_detections.json`, and `ball_events.json` directly to the `public/data/` folder.*
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. **Navigate and Run Dev Server**:
+   Navigate into the dashboard directory and spin up Vite:
+   ```bash
+   cd dashboard
+   npm install
+   npm run dev
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3. **Open Browser**:
+   Click on the local URL printed in the terminal (typically [http://localhost:5173/](http://localhost:5173/)) to open the dashboard.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## ⚙️ Interactive Controls
+
+* **Layer Toggles**: Click the floating settings panel (top right overlay) to enable or disable specific layers dynamically.
+* **Playback Speeds**: Instantly switch the video speed between `0.25x`, `0.5x`, `0.75x`, and `1.0x` using the buttons on the control toolbar.
+* **Frame Scrubbing**: Drag the progress timeline to seek to specific playback offsets and inspect coordinate states instantly on the canvas.
