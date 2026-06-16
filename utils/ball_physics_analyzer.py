@@ -46,9 +46,83 @@ class BallPhysicsAnalyzer:
                 
         df = pd.DataFrame(records)
         
+        # Track raw detection status for outlier de-flickering
+        detected_mask = [1 in d for d in ball_detections]
+        
+        # Pass 1: Remove single-frame spikes
+        for t in range(1, len(df) - 1):
+            if detected_mask[t]:
+                # find prev detected within 5 frames
+                prev_idx = None
+                for p in range(t-1, max(-1, t-6), -1):
+                    if detected_mask[p]:
+                        prev_idx = p
+                        break
+                # find next detected within 5 frames
+                next_idx = None
+                for n in range(t+1, min(len(df), t+6)):
+                    if detected_mask[n]:
+                        next_idx = n
+                        break
+                        
+                if prev_idx is not None and next_idx is not None:
+                    px, py = df.iloc[prev_idx]['x_center'], df.iloc[prev_idx]['y_center']
+                    cx, cy = df.iloc[t]['x_center'], df.iloc[t]['y_center']
+                    nx, ny = df.iloc[next_idx]['x_center'], df.iloc[next_idx]['y_center']
+                    
+                    d_prev = np.sqrt((cx - px)**2 + (cy - py)**2)
+                    d_next = np.sqrt((nx - cx)**2 + (ny - cy)**2)
+                    d_bridge = np.sqrt((nx - px)**2 + (ny - py)**2)
+                    
+                    speed_prev = d_prev / (t - prev_idx)
+                    speed_next = d_next / (next_idx - t)
+                    
+                    if (speed_prev > 150 and speed_next > 150) or (d_prev > 150 and d_next > 150 and d_bridge < 120):
+                        df.loc[t, 'x_center'] = np.nan
+                        df.loc[t, 'y_center'] = np.nan
+                        detected_mask[t] = False
+
+        # Pass 2: Remove two-frame consecutive spikes
+        for t in range(1, len(df) - 2):
+            if detected_mask[t] and detected_mask[t+1]:
+                # Find prev detected before t
+                prev_idx = None
+                for p in range(t-1, max(-1, t-6), -1):
+                    if detected_mask[p]:
+                        prev_idx = p
+                        break
+                # Find next detected after t+1
+                next_idx = None
+                for n in range(t+2, min(len(df), t+7)):
+                    if detected_mask[n]:
+                        next_idx = n
+                        break
+                        
+                if prev_idx is not None and next_idx is not None:
+                    px, py = df.iloc[prev_idx]['x_center'], df.iloc[prev_idx]['y_center']
+                    c1x, c1y = df.iloc[t]['x_center'], df.iloc[t]['y_center']
+                    c2x, c2y = df.iloc[t+1]['x_center'], df.iloc[t+1]['y_center']
+                    nx, ny = df.iloc[next_idx]['x_center'], df.iloc[next_idx]['y_center']
+                    
+                    d_prev = np.sqrt((c1x - px)**2 + (c1y - py)**2)
+                    d_next = np.sqrt((nx - c2x)**2 + (ny - c2y)**2)
+                    d_bridge = np.sqrt((nx - px)**2 + (ny - py)**2)
+                    
+                    speed_prev = d_prev / (t - prev_idx)
+                    speed_next = d_next / (next_idx - (t+1))
+                    
+                    if (speed_prev > 150 and speed_next > 150) or (d_prev > 150 and d_next > 150 and d_bridge < 120):
+                        df.loc[t, 'x_center'] = np.nan
+                        df.loc[t, 'y_center'] = np.nan
+                        df.loc[t+1, 'x_center'] = np.nan
+                        df.loc[t+1, 'y_center'] = np.nan
+                        detected_mask[t] = False
+                        detected_mask[t+1] = False
+        
         # Interpolate NaNs to handle gaps
         df['x_center'] = df['x_center'].interpolate(method='linear')
         df['y_center'] = df['y_center'].interpolate(method='linear')
+        df = df.bfill()
         
         # Apply a rolling window filter to smooth out pixel jitter (reduced size window to preserve dinks)
         df['x_smooth'] = df['x_center'].rolling(window=self.window_size, min_periods=1, center=True).mean()
@@ -104,11 +178,24 @@ class BallPhysicsAnalyzer:
         else:
             print(f"[WARNING] Video file not found. Defaulting to frame height: {frame_height} px")
             
+        # Load court keypoints to get the far baseline Y limit
+        court_stub_path = 'tracker_stubs/court_keypoints.pkl'
+        far_baseline_y = frame_height * 0.35  # Default fallback
+        if os.path.exists(court_stub_path):
+            try:
+                with open(court_stub_path, 'rb') as f:
+                    kp = pickle.load(f)
+                if len(kp) >= 3:
+                    far_baseline_y = min(kp[0][1], kp[1][1], kp[2][1])
+                    print(f"[PHYSICS] Court keypoints loaded. Far baseline Y limit: {far_baseline_y:.1f} px")
+            except Exception as e:
+                print(f"[WARNING] Failed to load court keypoints for limit check: {e}")
+                
         # Keep track of bounce frames to suppress adjacent hit false positives
         bounce_frames = set()
         
         # Step 1: Detect all Bounces first (Primary Priority with Spatial Height Constraint)
-        # Bounces are highly distinct vertical velocity V-shaped inflections in the lower half of the screen.
+        # Bounces are highly distinct vertical velocity V-shaped inflections.
         for t in range(2, n - 2):
             row = self.df.iloc[t]
             frame_idx = int(row['frame'])
@@ -120,13 +207,20 @@ class BallPhysicsAnalyzer:
             
             is_y_peak = (y_prev < y_curr) and (y_curr > y_next)
             
-            if is_y_peak and self.df.iloc[t]['ay'] < -bounce_height_threshold:
-                # 1. "Mid-Air" Bounce Filter: Bounce y_curr must be in the lower half of the video frame
-                if y_curr > frame_height * 0.5:
-                    bounce_frames.add(frame_idx)
-                else:
-                    # Trajectory inversion too high in the air; force to be evaluated as a potential HIT in Step 2.
-                    pass
+            if is_y_peak:
+                # Check both ay(t) and ay(t+1) since physical bounce deceleration peak
+                # often registers on the frame immediately after the screen-space Y maximum.
+                ay_t = row['ay']
+                ay_next = self.df.iloc[t+1]['ay']
+                min_ay = min(ay_t, ay_next)
+                
+                if min_ay < -bounce_height_threshold:
+                    # Bounces must occur below the far baseline (with a 15px buffer for safety)
+                    if y_curr > (far_baseline_y - 15):
+                        bounce_frames.add(frame_idx)
+                    else:
+                        # Trajectory inversion too high in the air
+                        pass
         
         # Step 2: Resolve Events with Priority Hierarchy, Cooldown Lockouts, and Mutual Exclusivity
         cooldown_counter = 0

@@ -10,6 +10,7 @@ class BallTracker:
         self.model = YOLO(model_path)
 
     def interpolate_ball_positions(self, ball_positions):
+        import numpy as np
         print("Interpolating missing ball positions using Pandas...")
         # Extract coordinates to a list, using None for missing frames
         extracted_coords = []
@@ -17,7 +18,10 @@ class BallTracker:
         detected_mask = []
         for pos in ball_positions:
             if 1 in pos:
-                extracted_coords.append(pos[1])
+                data = pos[1]
+                # Support both dict and raw list formats
+                bbox = data['bbox'] if isinstance(data, dict) else data
+                extracted_coords.append(bbox)
                 detected_mask.append(True)
             else:
                 extracted_coords.append([None, None, None, None])
@@ -25,6 +29,78 @@ class BallTracker:
         
         # Create DataFrame
         df = pd.DataFrame(extracted_coords, columns=['x1', 'y1', 'x2', 'y2'])
+        df['x_center'] = (df['x1'] + df['x2']) / 2.0
+        df['y_center'] = (df['y1'] + df['y2']) / 2.0
+        
+        # Pass 1: Remove single-frame spikes
+        for t in range(1, len(df) - 1):
+            if detected_mask[t]:
+                # find prev detected within 5 frames
+                prev_idx = None
+                for p in range(t-1, max(-1, t-6), -1):
+                    if detected_mask[p]:
+                        prev_idx = p
+                        break
+                # find next detected within 5 frames
+                next_idx = None
+                for n in range(t+1, min(len(df), t+6)):
+                    if detected_mask[n]:
+                        next_idx = n
+                        break
+                        
+                if prev_idx is not None and next_idx is not None:
+                    px, py = df.iloc[prev_idx]['x_center'], df.iloc[prev_idx]['y_center']
+                    cx, cy = df.iloc[t]['x_center'], df.iloc[t]['y_center']
+                    nx, ny = df.iloc[next_idx]['x_center'], df.iloc[next_idx]['y_center']
+                    
+                    d_prev = np.sqrt((cx - px)**2 + (cy - py)**2)
+                    d_next = np.sqrt((nx - cx)**2 + (ny - cy)**2)
+                    d_bridge = np.sqrt((nx - px)**2 + (ny - py)**2)
+                    
+                    speed_prev = d_prev / (t - prev_idx)
+                    speed_next = d_next / (next_idx - t)
+                    
+                    if (speed_prev > 150 and speed_next > 150) or (d_prev > 150 and d_next > 150 and d_bridge < 120):
+                        df.iloc[t] = [None, None, None, None, None, None]
+                        detected_mask[t] = False
+
+        # Pass 2: Remove two-frame consecutive spikes
+        for t in range(1, len(df) - 2):
+            if detected_mask[t] and detected_mask[t+1]:
+                # Find prev detected before t
+                prev_idx = None
+                for p in range(t-1, max(-1, t-6), -1):
+                    if detected_mask[p]:
+                        prev_idx = p
+                        break
+                # Find next detected after t+1
+                next_idx = None
+                for n in range(t+2, min(len(df), t+7)):
+                    if detected_mask[n]:
+                        next_idx = n
+                        break
+                        
+                if prev_idx is not None and next_idx is not None:
+                    px, py = df.iloc[prev_idx]['x_center'], df.iloc[prev_idx]['y_center']
+                    c1x, c1y = df.iloc[t]['x_center'], df.iloc[t]['y_center']
+                    c2x, c2y = df.iloc[t+1]['x_center'], df.iloc[t+1]['y_center']
+                    nx, ny = df.iloc[next_idx]['x_center'], df.iloc[next_idx]['y_center']
+                    
+                    d_prev = np.sqrt((c1x - px)**2 + (c1y - py)**2)
+                    d_next = np.sqrt((nx - c2x)**2 + (ny - c2y)**2)
+                    d_bridge = np.sqrt((nx - px)**2 + (ny - py)**2)
+                    
+                    speed_prev = d_prev / (t - prev_idx)
+                    speed_next = d_next / (next_idx - (t+1))
+                    
+                    if (speed_prev > 150 and speed_next > 150) or (d_prev > 150 and d_next > 150 and d_bridge < 120):
+                        df.iloc[t] = [None, None, None, None, None, None]
+                        df.iloc[t+1] = [None, None, None, None, None, None]
+                        detected_mask[t] = False
+                        detected_mask[t+1] = False
+                        
+        # Drop temporary helper columns
+        df = df[['x1', 'y1', 'x2', 'y2']]
         
         # Linearly interpolate missing bounding boxes
         df = df.interpolate(method='linear')
@@ -64,21 +140,62 @@ class BallTracker:
         if verbose:
             print("Running ball detection on frames...")
         ball_detections = []
+        last_ball_center = None
+        lost_frames = 0
 
         # 2. Run prediction frame by frame
         for i, frame in enumerate(frames):
-            # Run prediction with conf=0.15
-            results = self.model.predict(frame, conf=0.15, verbose=verbose)[0]
+            # Run prediction with lower confidence threshold (0.08) to capture candidates
+            results = self.model.predict(frame, conf=0.08, verbose=False)[0]
             
             frame_dict = {}
-            # If a ball is detected, store the first detection (usually highest confidence) under key 1
             if len(results.boxes) > 0:
-                box = results.boxes[0]
-                coords = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
-                frame_dict[1] = coords
+                candidates = []
+                for box in results.boxes:
+                    coords = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
+                    conf = float(box.conf[0])
+                    cx = (coords[0] + coords[2]) / 2.0
+                    cy = (coords[1] + coords[3]) / 2.0
+                    candidates.append({'coords': coords, 'center': (cx, cy), 'conf': conf})
+                
+                best_candidate = None
+                if last_ball_center is not None:
+                    # Pick closest candidate
+                    min_dist = float('inf')
+                    for cand in candidates:
+                        dist = np.sqrt((cand['center'][0] - last_ball_center[0])**2 + (cand['center'][1] - last_ball_center[1])**2)
+                        if dist < min_dist:
+                            min_dist = dist
+                            best_candidate = cand
+                            
+                    # If the closest candidate is within 150 pixels, select it
+                    if min_dist < 150:
+                        last_ball_center = best_candidate['center']
+                        frame_dict[1] = best_candidate['coords']
+                        lost_frames = 0
+                    else:
+                        lost_frames += 1
+                        if lost_frames > 5:
+                            # Re-initialize to highest confidence candidate
+                            sorted_cands = sorted(candidates, key=lambda x: x['conf'], reverse=True)
+                            best_candidate = sorted_cands[0]
+                            last_ball_center = best_candidate['center']
+                            frame_dict[1] = best_candidate['coords']
+                            lost_frames = 0
+                else:
+                    # Re-initialize to highest confidence candidate
+                    sorted_cands = sorted(candidates, key=lambda x: x['conf'], reverse=True)
+                    best_candidate = sorted_cands[0]
+                    last_ball_center = best_candidate['center']
+                    frame_dict[1] = best_candidate['coords']
+                    lost_frames = 0
+            else:
+                lost_frames += 1
+                if lost_frames > 5:
+                    last_ball_center = None
             
             ball_detections.append(frame_dict)
-            if verbose and ((i + 1) % 10 == 0 or (i + 1) == len(frames)):
+            if verbose and ((i + 1) % 100 == 0 or (i + 1) == len(frames)):
                 print(f"Processed {i + 1}/{len(frames)} frames for ball detection")
 
         # 3. Save to stub if path is provided
