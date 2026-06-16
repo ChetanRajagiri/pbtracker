@@ -72,7 +72,7 @@ uv sync
 
 ## 🏃 Pipeline Steps
 
-The pipeline runs in **4 sequential stages**. Each stage caches its output as a `.pkl` stub so subsequent runs skip expensive inference.
+The pipeline runs in **5 sequential stages**. Each stage caches its output as a `.pkl` stub so subsequent runs skip expensive inference.
 
 ### Step 1 — Court Keypoint Selection
 
@@ -175,14 +175,38 @@ rm tracker_stubs/court_keypoints.pkl
 
 ## 📊 Data Formats
 
-### Player Detections (`player_detections.pkl`)
+### Filtered Player Detections (`player_detections.pkl`)
+Saved by `auto_player_filter.py` mapped to Master IDs 1-4. Embeddings and similarity statistics are stripped from this final dashboard-ready file to save space.
 
 ```python
-# List of dicts, one per frame. Each dict maps track_id → metadata.
+# List of dicts, one per frame. Each dict maps master_id → metadata.
 [
     {                                    # Frame 0
         1: {'bbox': [x1, y1, x2, y2], 'is_on_court': True},
         2: {'bbox': [x1, y1, x2, y2], 'is_on_court': False},
+    },
+    { ... },                             # Frame 1
+    ...
+]
+```
+
+### Raw Player Detections (`player_detections_raw.pkl`)
+Saved by `main.py` right after tracking and before filtration. Contains the raw outputs from `player_tracker.detect_frames()`, preserving original raw track IDs and 512-dimensional OSNet embeddings.
+
+```python
+# List of dicts, one per frame. Maps raw_tid (negative for out-of-court) → metadata.
+[
+    {                                    # Frame 0
+        3: {
+            'bbox': [x1, y1, x2, y2],
+            'embedding': array([-0.0125, 0.0435, ...], dtype=float32),
+            'is_on_court': True
+        },
+        -4: {
+            'bbox': [x1, y1, x2, y2],
+            'embedding': None,
+            'is_on_court': False
+        },
     },
     { ... },                             # Frame 1
     ...
@@ -225,7 +249,6 @@ The court boundary polygon for filtering uses corners at indices `[0, 2, 11, 9]`
 | Multi-Object Tracking | YOLO BoT-SORT (`model.track(persist=True)`) |
 | Court Detection | Manual 12-point OpenCV GUI selector |
 | Ball Interpolation | Pandas `DataFrame.interpolate(method='linear')` |
-| Track Healing | HSV histogram correlation (OpenCV) + ResNet50 cosine similarity (PyTorch) |
 | Video I/O | OpenCV `VideoCapture` / `VideoWriter` |
 
 ---
