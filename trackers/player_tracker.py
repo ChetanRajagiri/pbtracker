@@ -178,25 +178,53 @@ class PlayerTracker:
             detections = player_detections[i] if i < len(player_detections) else {}
             
             for track_id, data in detections.items():
-                # Bug 3 / Additional Fix: Only draw active players 1-4
                 if track_id not in [1, 2, 3, 4]:
                     continue
                     
                 bbox = data['bbox']
-                is_on_court = data.get('is_on_court', True)
                 x1, y1, x2, y2 = map(int, bbox)
                 
-                # Bounding box color configuration
-                color = (0, 255, 0) if is_on_court else (0, 165, 255)
-                cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
+                # Assign premium custom color maps matching the shared design:
+                color_map = {
+                    1: (0, 95, 255),    # Player 1: Orange-Red
+                    2: (0, 215, 255),   # Player 2: Gold-Yellow
+                    3: (255, 191, 0),   # Player 3: Light Cyan/Blue
+                    4: (255, 50, 50)    # Player 4: Royal Blue
+                }
+                color = color_map.get(track_id, (0, 255, 0))
                 
-                # Additional Fix: Remove "(Out)" label from text overlay
+                # 1. Draw perspective-aligned ground ellipse around the player's feet
+                center_x = int((x1 + x2) / 2)
+                center_y = int(y2)
+                # Scale width based on bounding box width, compress height for perspective
+                axes_width = int((x2 - x1) * 0.7)
+                axes_height = int(axes_width * 0.3)
+                
+                # Transparent filled shadow for the ring
+                overlay = annotated_frame.copy()
+                cv2.ellipse(overlay, (center_x, center_y), (axes_width, axes_height), 0, 0, 360, color, -1, cv2.LINE_AA)
+                cv2.addWeighted(overlay, 0.25, annotated_frame, 0.75, 0, annotated_frame)
+                
+                # Draw the outline of the ring
+                cv2.ellipse(annotated_frame, (center_x, center_y), (axes_width, axes_height), 0, 0, 360, color, 3, cv2.LINE_AA)
+                
+                # 2. Draw a clean, premium name tag pill centered above the player's head
                 label = f"Player {track_id}"
+                font_scale = 0.45
+                font_thickness = 1
+                (w, h), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)
                 
-                (w, h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
-                cv2.rectangle(annotated_frame, (x1, y1 - 25), (x1 + w + 10, y1), color, -1)
-                cv2.putText(annotated_frame, label, (x1 + 5, y1 - 8), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv2.LINE_AA)
+                # Determine tag positioning above head
+                tag_y = max(y1 - 12, h + 15)
+                # Outer pill rectangle
+                cv2.rectangle(annotated_frame, 
+                              (center_x - w//2 - 8, tag_y - h - 6), 
+                              (center_x + w//2 + 8, tag_y + 4), 
+                              color, -1, cv2.LINE_AA)
+                # Text overlay inside pill
+                cv2.putText(annotated_frame, label, 
+                            (center_x - w//2, tag_y - 1), 
+                            cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), font_thickness, cv2.LINE_AA)
             
             annotated_frames.append(annotated_frame)
             
