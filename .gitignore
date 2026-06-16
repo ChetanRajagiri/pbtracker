@@ -29,3 +29,4 @@ uv.lock
 # Debug artifacts
 debug/*.jpg
 *.jpg
+*.mp4
